@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>O MY HELP — House Help</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Syne:wght@400;600;700;800&family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --p:#E8560A;--pd:#B83D00;--pl:#FF7A40;
+  --jade:#0A8A72;--jaded:#076B59;--jadel:#0DC49E;
+  --gold:#C49010;--goldl:#F0B830;--rose:#D63550;
+  --ink:#0F0A05;--ink2:#1C1108;--ink3:#2C1810;
+  --w:#fff;
+  --ff-d:'Cormorant Garamond',serif;
+  --ff-u:'Syne',sans-serif;
+  --ff-b:'Noto Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--ff-b);background:var(--ink);color:var(--w);overflow-x:hidden}
+button{font-family:var(--ff-u);cursor:pointer;border:none;outline:none;transition:all .2s}
+button:hover:not(:disabled){transform:translateY(-1px)}
+a{text-decoration:none;color:inherit}
+input,textarea,select{font-family:var(--ff-b);outline:none}
+.page{display:none!important}
+.page.active{display:block!important}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--ink3);border-radius:2px}
+.pill{display:inline-flex;align-items:center;border-radius:20px;padding:3px 10px;font-size:9px;font-weight:700;font-family:var(--ff-u);letter-spacing:.8px;text-transform:uppercase;white-space:nowrap}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+.reveal.in{opacity:1;transform:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink2);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 20px;font-size:13px;font-family:var(--ff-u);font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* BUTTONS */
+.btn-p{padding:13px 28px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--pd));color:var(--w);font-weight:700;font-size:14px;font-family:var(--ff-u);box-shadow:0 4px 20px rgba(232,86,10,.4);letter-spacing:.3px}
+.btn-g{padding:11px 24px;border-radius:12px;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:var(--w);font-weight:600;font-size:13px;font-family:var(--ff-u)}
+
+/* NAV */
+.c-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;transition:all .3s}
+.c-nav.sc{background:rgba(15,10,5,.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+.ni{max-width:1280px;margin:0 auto;height:68px;display:flex;align-items:center;justify-content:space-between}
+.logo-w{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo-m{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-weight:700;font-size:16px;color:var(--w);font-style:italic;box-shadow:0 4px 16px rgba(232,86,10,.4)}
+.logo-t{font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w)}
+.logo-s{font-family:var(--ff-u);font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.3);margin-top:1px}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-family:var(--ff-u);font-size:12px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.8px;transition:color .2s}
+.nav-links a:hover{color:var(--w)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:68px;background:linear-gradient(160deg,#0F0A05 0%,#1C1108 50%,#0A1A10 100%)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(232,86,10,.1) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 20% 70%,rgba(10,138,114,.07) 0%,transparent 50%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.hg{max-width:1280px;margin:0 auto;padding:64px 40px;width:100%;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.eyebrow{display:inline-flex;flex-direction:column;gap:4px;background:rgba(232,86,10,.1);border:1px solid rgba(232,86,10,.22);border-radius:14px;padding:10px 16px;margin-bottom:26px}
+.ebdot{width:5px;height:5px;border-radius:50%;background:var(--jadel);animation:pulse 2s infinite;flex-shrink:0}
+.h1{font-family:var(--ff-d);font-size:clamp(46px,5vw,72px);font-weight:700;line-height:1.05;color:var(--w);margin-bottom:22px}
+.h1 em{font-style:italic;color:var(--p)}
+.hero-p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.82;margin-bottom:34px;max-width:480px;font-weight:300}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.hero-social{display:flex;align-items:center;gap:14px}
+.h-avs{display:flex}
+.h-av{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.12);font-size:9px;font-weight:800;color:var(--w);display:flex;align-items:center;justify-content:center}
+
+/* WORKER PREVIEW CARD */
+.wpc{background:rgba(255,255,255,.05);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.1);border-radius:24px;overflow:hidden;animation:float 5s ease-in-out infinite;position:relative}
+.wpc-h{background:linear-gradient(135deg,rgba(232,86,10,.12),rgba(10,138,114,.08));padding:20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wpc-badge{font-family:var(--ff-u);font-size:9px;font-weight:700;color:var(--goldl);letter-spacing:1.5px;margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.wpc-badge::before{content:'';width:14px;height:1px;background:var(--goldl)}
+.wpc-prof{display:flex;gap:13px;align-items:center}
+.wpc-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-weight:700;font-size:21px;color:var(--w);box-shadow:0 6px 20px rgba(232,86,10,.38)}
+.wpc-name{font-family:var(--ff-d);font-size:21px;font-weight:700;color:var(--w)}
+.wpc-role{font-family:var(--ff-u);font-size:10px;font-weight:600;color:var(--pl);margin-top:3px;letter-spacing:.5px}
+.wpc-b{padding:20px}
+.wpc-sal{display:flex;justify-content:space-between;background:rgba(255,255,255,.04);border-radius:11px;padding:11px 14px;margin-bottom:14px}
+.wpc-sl{font-family:var(--ff-u);font-size:8px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.25);margin-bottom:3px}
+.wpc-sv{font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w)}
+.wpc-sv.g{color:var(--jadel)}
+.wpc-72{position:absolute;bottom:-14px;right:20px;background:var(--gold);border-radius:10px;padding:7px 13px;font-family:var(--ff-u);font-size:11px;font-weight:700;color:var(--w);box-shadow:0 4px 14px rgba(196,144,16,.5)}
+
+/* STATS */
+.stats{border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:0 40px}
+.si{max-width:1280px;margin:0 auto;display:flex;justify-content:center;gap:80px;flex-wrap:wrap}
+.sit{padding:22px 16px;text-align:center}
+.sv{font-family:var(--ff-d);font-size:28px;font-weight:700;color:var(--w)}
+.sl2{font-family:var(--ff-u);font-size:9px;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,.3);margin-top:3px}
+
+/* SECTIONS */
+section{padding:88px 40px}
+.sec{max-width:1280px;margin:0 auto}
+.sec-lbl{font-family:var(--ff-u);font-size:10px;font-weight:700;letter-spacing:3px;color:var(--p);margin-bottom:10px}
+.sec-t{font-family:var(--ff-d);font-size:clamp(30px,4vw,50px);font-weight:700;color:var(--w);line-height:1.1;margin-bottom:14px}
+.sec-t em{font-style:italic;color:rgba(255,255,255,.28)}
+.sec-sub{font-size:15px;color:rgba(255,255,255,.38);line-height:1.82;max-width:500px;font-weight:300}
+
+/* ROLES */
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:20px}
+.rc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:26px 22px;transition:all .22s;cursor:pointer;position:relative;overflow:hidden}
+.rc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,86,10,.07),transparent);opacity:0;transition:opacity .22s}
+.rc:hover{border-color:rgba(232,86,10,.28);transform:translateY(-3px);box-shadow:0 14px 38px rgba(232,86,10,.09)}
+.rc:hover::before{opacity:1}
+.rc-icon{width:50px;height:50px;border-radius:13px;background:rgba(232,86,10,.09);display:flex;align-items:center;justify-content:center;font-size:23px;margin-bottom:14px}
+.rc-t{font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w);margin-bottom:7px}
+.rc-d{font-size:13px;color:rgba(255,255,255,.38);line-height:1.65;margin-bottom:14px;font-weight:300}
+.rc-s{font-family:var(--ff-u);font-size:12px;font-weight:700;color:var(--jadel)}
+.rc-a{position:absolute;top:22px;right:22px;font-size:16px;color:rgba(255,255,255,.13);transition:all .22s}
+.rc:hover .rc-a{color:var(--p);transform:translateX(3px)}
+
+/* HOW */
+.htog{display:inline-flex;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:4px;gap:4px;margin-top:14px}
+.hbtn{padding:8px 20px;border-radius:9px;font-family:var(--ff-u);font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.38);background:transparent;transition:all .2s}
+.hbtn.a{background:rgba(255,255,255,.09);color:var(--w)}
+.how-g{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:48px}
+.how-s{position:relative}
+.how-num{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-weight:700;font-size:17px;color:var(--w);margin-bottom:14px;box-shadow:0 4px 14px rgba(232,86,10,.32)}
+.how-ic{font-size:22px;margin-bottom:10px}
+.how-t{font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:7px}
+.how-d{font-size:13px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300}
+
+/* TRUST */
+.tg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px;margin-top:48px}
+.tc{border-radius:18px;padding:22px 20px}
+.tc.j{background:linear-gradient(145deg,var(--jade),var(--jaded))}
+.tc.l{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+
+/* REFUND */
+.ref-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:18px}
+.ref-cell{background:rgba(255,255,255,.04);border-radius:9px;padding:9px 5px;text-align:center}
+.ref-mo{font-family:var(--ff-u);font-size:8px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.22)}
+.ref-pct{font-family:var(--ff-d);font-size:16px;font-weight:700;margin-top:3px}
+
+/* TESTIMONIALS */
+.test-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:14px;margin-top:48px}
+.test-c{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:22px;display:flex;flex-direction:column}
+.test-stars{color:var(--goldl);font-size:12px;margin-bottom:10px;letter-spacing:2px}
+.test-t{font-family:var(--ff-d);font-size:17px;font-weight:400;font-style:italic;color:rgba(255,255,255,.62);line-height:1.75;flex:1;margin-bottom:14px}
+.test-n{font-family:var(--ff-u);font-size:11px;font-weight:700;color:var(--w)}
+.test-l{font-family:var(--ff-u);font-size:9px;color:rgba(255,255,255,.28);margin-top:2px;letter-spacing:.5px}
+
+/* PRICING */
+.trial-b{background:rgba(10,138,114,.07);border:1px solid rgba(10,138,114,.18);border-radius:15px;padding:17px 26px;display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.plan-g{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.plan{border-radius:20px;padding:30px 26px;display:flex;flex-direction:column;border:1.5px solid rgba(255,255,255,.08)}
+.plan:not(.pop){background:rgba(255,255,255,.03)}
+.plan.pop{background:linear-gradient(155deg,rgba(232,86,10,.14),rgba(232,86,10,.05));border-color:rgba(232,86,10,.38);box-shadow:0 18px 56px rgba(232,86,10,.14);position:relative}
+.pop-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--p);color:var(--w);font-family:var(--ff-u);font-size:9px;font-weight:800;letter-spacing:1.5px;padding:3px 14px;border-radius:20px;white-space:nowrap}
+.plan-n{font-family:var(--ff-d);font-size:21px;font-weight:700;color:var(--w);margin-bottom:7px}
+.plan-p{font-family:var(--ff-d);font-size:40px;font-weight:700;color:var(--p)}
+.plan-per{font-family:var(--ff-u);font-size:11px;color:rgba(255,255,255,.3);margin-bottom:3px}
+.plan-feats{flex:1;display:flex;flex-direction:column;gap:9px;margin:18px 0}
+.plan-feat{display:flex;gap:7px;align-items:flex-start;font-size:13px;color:rgba(255,255,255,.5)}
+.plan-chk{font-size:11px;margin-top:1px;flex-shrink:0}
+
+/* FAQ */
+.faq-i{border-bottom:1px solid rgba(255,255,255,.07);overflow:hidden}
+.faq-q-btn{width:100%;padding:20px 0;display:flex;justify-content:space-between;align-items:center;background:transparent;gap:14px;cursor:pointer}
+.faq-qt{font-family:var(--ff-d);font-size:17px;font-weight:600;color:rgba(255,255,255,.7);text-align:left;line-height:1.4}
+.faq-ic{font-size:21px;color:var(--p);flex-shrink:0;transition:transform .22s;font-weight:300}
+.faq-i.op .faq-ic{transform:rotate(45deg)}
+.faq-i.op .faq-qt{color:var(--w)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .32s ease}
+.faq-i.op .faq-a{max-height:400px}
+.faq-ai{padding:0 0 18px;font-size:13px;color:rgba(255,255,255,.38);line-height:1.82;font-weight:300}
+
+/* WORKER LANDING */
+.w-hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:68px;background:linear-gradient(160deg,#050803 0%,#0A1208 40%,#0F1A0A 100%)}
+.w-acc{position:absolute;top:-80px;right:-80px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(13,196,158,.07) 0%,transparent 70%);pointer-events:none}
+.wh-inner{max-width:1280px;margin:0 auto;padding:64px 40px;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative;z-index:1}
+.money-card{background:rgba(13,196,158,.05);border:1px solid rgba(13,196,158,.14);border-radius:22px;padding:26px}
+.mc-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(13,196,158,.09)}
+.mc-row:last-of-type{border:none}
+.mc-total{background:rgba(13,196,158,.09);border-radius:11px;padding:13px 15px;margin-top:14px;display:flex;justify-content:space-between;align-items:center}
+.ws-g{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:48px}
+.ws{background:rgba(13,196,158,.04);border:1px solid rgba(13,196,158,.09);border-radius:18px;padding:24px;position:relative;overflow:hidden;transition:all .22s}
+.ws:hover{border-color:rgba(13,196,158,.28);transform:translateY(-3px)}
+.ws-bg-n{font-family:var(--ff-d);font-size:68px;font-weight:700;color:rgba(13,196,158,.06);position:absolute;top:-10px;right:14px;line-height:1}
+.calc-sec{padding:72px 40px;background:linear-gradient(135deg,rgba(10,138,114,.06),rgba(232,86,10,.04));border-top:1px solid rgba(13,196,158,.09);border-bottom:1px solid rgba(13,196,158,.09)}
+.calc-slider{width:100%;height:4px;accent-color:var(--jadel);margin:18px 0}
+.calc-disp{font-family:var(--ff-d);font-size:60px;font-weight:700;color:var(--jadel);margin:10px 0}
+
+/* ADMIN LOGIN */
+.al-wrap{min-height:100vh;display:flex;flex-direction:column;background:#060A0E}
+.al-hdr{padding:22px 40px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between}
+.live-b{display:flex;align-items:center;gap:5px;background:rgba(10,138,114,.09);border:1px solid rgba(10,138,114,.18);border-radius:20px;padding:4px 11px;font-family:var(--ff-u);font-size:9px;font-weight:700;color:var(--jadel);letter-spacing:1px}
+.live-dot{width:4px;height:4px;border-radius:50%;background:var(--jadel);animation:pulse 2s infinite}
+.al-main{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0}
+.al-metrics{background:rgba(255,255,255,.02);border-right:1px solid rgba(255,255,255,.05);padding:44px;display:flex;flex-direction:column;gap:16px}
+.al-m{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:13px;padding:15px 18px;display:flex;justify-content:space-between;align-items:center}
+.al-mv{font-family:var(--ff-d);font-size:26px;font-weight:700;color:var(--w)}
+.al-ml{font-family:var(--ff-u);font-size:9px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.28);margin-bottom:5px}
+.al-panel{padding:44px;display:flex;flex-direction:column;justify-content:center;max-width:400px;width:100%;margin:0 auto}
+.al-roles{display:flex;gap:7px;margin-bottom:22px}
+.al-rb{flex:1;padding:9px;border-radius:9px;border:1px solid rgba(255,255,255,.07);background:transparent;color:rgba(255,255,255,.38);font-family:var(--ff-u);font-size:11px;font-weight:600;transition:all .2s}
+.al-rb.a{background:rgba(232,86,10,.14);border-color:rgba(232,86,10,.28);color:var(--w)}
+.al-ig{margin-bottom:14px}
+.al-lbl{font-family:var(--ff-u);font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.28);display:block;margin-bottom:6px}
+.al-inp{width:100%;padding:12px 15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;color:var(--w);font-family:var(--ff-b);font-size:14px;transition:border-color .2s}
+.al-inp:focus{border-color:rgba(232,86,10,.38)}
+.al-inp::placeholder{color:rgba(255,255,255,.18)}
+.al-login-btn{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--pd));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:13px;box-shadow:0 4px 18px rgba(232,86,10,.28);margin-top:7px}
+
+/* ADMIN DASHBOARD */
+.a-dash{min-height:100vh;background:#060A0E;display:flex;font-family:var(--ff-u)}
+.a-sb{flex-shrink:0;background:rgba(255,255,255,.02);border-right:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden;transition:width .22s;width:210px}
+.a-sb-hdr{padding:16px 12px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:9px;overflow:hidden}
+.a-sb-lm{width:28px;height:28px;border-radius:7px;flex-shrink:0;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-size:12px;font-weight:700;color:var(--w);font-style:italic}
+.a-sb-n{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--w);white-space:nowrap}
+.a-sb-s{font-family:var(--ff-u);font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.2);white-space:nowrap;margin-top:1px}
+.a-nav{flex:1;padding:7px;overflow-y:auto}
+.a-ni{width:100%;display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:8px;background:transparent;color:rgba(255,255,255,.32);font-family:var(--ff-u);font-size:11px;font-weight:600;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-align:left;transition:all .2s}
+.a-ni.a{background:rgba(232,86,10,.14);color:var(--w)}
+.a-ni:hover:not(.a){background:rgba(255,255,255,.04);color:rgba(255,255,255,.55)}
+.a-ni-ic{font-size:13px;flex-shrink:0;width:15px;text-align:center}
+.a-ni-dot{width:3px;height:3px;border-radius:50%;background:var(--p);margin-left:auto;flex-shrink:0}
+.a-sb-ft{padding:7px;border-top:1px solid rgba(255,255,255,.05)}
+.a-col-btn{width:100%;padding:6px;border-radius:7px;border:1px solid rgba(255,255,255,.06);background:transparent;color:rgba(255,255,255,.2);font-family:var(--ff-u);font-size:10px;display:flex;align-items:center;justify-content:center;gap:5px;overflow:hidden;white-space:nowrap}
+.a-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.a-tb{background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.05);padding:13px 26px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.a-tb-t{font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w)}
+.a-tb-s{font-family:var(--ff-u);font-size:9px;color:rgba(255,255,255,.22);margin-top:2px;letter-spacing:.5px}
+.a-cnt{flex:1;padding:22px 26px;overflow-y:auto}
+.a-alert{background:rgba(214,53,80,.07);border:1px solid rgba(214,53,80,.18);border-radius:11px;padding:11px 16px;margin-bottom:18px;display:flex;gap:11px;flex-wrap:wrap;align-items:center}
+.a-kpig{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:11px;margin-bottom:18px}
+.a-kpi{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:13px;padding:14px}
+.a-kpi-ic{font-size:19px;margin-bottom:7px}
+.a-kpi-v{font-family:var(--ff-d);font-size:22px;font-weight:700;margin-bottom:3px}
+.a-kpi-l{font-family:var(--ff-u);font-size:9px;font-weight:600;letter-spacing:.8px;color:rgba(255,255,255,.28)}
+.a-kpi-tr{font-family:var(--ff-u);font-size:9px;font-weight:700;margin-top:3px}
+.a-cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.a-cc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:15px;padding:16px}
+.a-cc-t{font-family:var(--ff-d);font-size:15px;font-weight:700;color:var(--w);margin-bottom:14px}
+.a-bar-bg{height:5px;border-radius:3px;background:rgba(255,255,255,.06)}
+.a-bar-f{height:100%;border-radius:3px;transition:width .5s ease}
+.a-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.a-row:last-child{border:none}
+.a-rl{font-family:var(--ff-u);font-size:10px;color:rgba(255,255,255,.32)}
+.a-rv{font-family:var(--ff-d);font-size:12px;font-weight:700}
+
+/* AUTH */
+.auth-wrap2{min-height:100vh;display:flex;flex-direction:column}
+.auth-back{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:7px 13px;color:rgba(255,255,255,.55);font-family:var(--ff-u);font-size:11px;font-weight:600}
+.auth-card2{background:rgba(255,255,255,.04);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:30px 26px;width:100%;max-width:390px}
+.auth-tabs2{display:flex;background:rgba(0,0,0,.2);border-radius:11px;padding:4px;gap:4px;margin-bottom:22px}
+.auth-tab2{flex:1;padding:8px;border-radius:8px;background:transparent;color:rgba(255,255,255,.32);font-family:var(--ff-u);font-size:11px;font-weight:600;transition:all .2s}
+.auth-tab2.a{background:rgba(255,255,255,.08);color:var(--w)}
+.auth-err2{background:rgba(214,53,80,.1);border:1px solid rgba(214,53,80,.22);border-radius:9px;padding:9px 13px;font-family:var(--ff-u);font-size:11px;color:#FF8090;font-weight:600;margin-bottom:11px;display:none}
+.a-fld{margin-bottom:12px}
+.a-lbl{font-family:var(--ff-u);font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.28);display:block;margin-bottom:5px}
+.a-inp2{width:100%;padding:11px 13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:11px;color:var(--w);font-family:var(--ff-b);font-size:14px;transition:border-color .2s;box-sizing:border-box}
+.a-inp2:focus{border-color:rgba(232,86,10,.38)}
+.a-inp2::placeholder{color:rgba(255,255,255,.16)}
+.a-inp2.pin{font-size:24px;text-align:center;letter-spacing:11px}
+.a-hint{font-family:var(--ff-u);font-size:9px;margin-top:3px}
+.a-hint.e{color:#FF8090}.a-hint.o{color:var(--jadel)}.a-hint.m{color:rgba(255,255,255,.22)}
+.auth-sub-btn{width:100%;padding:12px;border-radius:11px;font-family:var(--ff-u);font-weight:700;font-size:13px;transition:all .2s;margin-top:3px}
+.auth-demo-btn{background:none;color:rgba(255,255,255,.22);font-family:var(--ff-u);font-size:10px;text-decoration:underline;margin-top:9px;width:100%}
+
+/* WORKER APP */
+.wa-pg{background:#0A0F08;min-height:100vh;padding-bottom:70px}
+.wa-hdr{background:linear-gradient(135deg,rgba(13,196,158,.12),rgba(10,138,114,.08));border-bottom:1px solid rgba(13,196,158,.1);padding:17px 18px 19px}
+.wa-ht{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.wa-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--jade),var(--jaded));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);box-shadow:0 4px 14px rgba(10,138,114,.38)}
+.wa-sg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.wa-ss{background:rgba(255,255,255,.05);border-radius:11px;padding:9px;text-align:center}
+.wa-sv{font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--jadel)}
+.wa-sl{font-family:var(--ff-u);font-size:8px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.3);margin-top:2px}
+.wa-body{padding:14px 15px 0;max-width:480px;margin:0 auto}
+.wa-cd{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:17px;padding:15px 17px;margin-bottom:11px}
+.wa-ct{font-family:var(--ff-u);font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.42);margin-bottom:13px}
+.wa-pr{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.wa-pr:last-child{border:none}
+.wa-pn{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--ff-u);font-size:10px;font-weight:700;flex-shrink:0}
+.wa-pn.dn{background:var(--jade);color:var(--w)}
+.wa-pn.lk{background:rgba(255,255,255,.05);color:rgba(255,255,255,.22)}
+.wa-pi{flex:1}
+.wa-pl{font-family:var(--ff-u);font-size:11px;font-weight:600;color:rgba(255,255,255,.7)}
+.wa-ps{font-size:10px;color:rgba(255,255,255,.28);margin-top:1px}
+.wa-alt{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:12px 14px;margin-bottom:9px}
+.wa-bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,8,.94);border-top:1px solid rgba(255,255,255,.07);display:flex;backdrop-filter:blur(10px)}
+.wa-nt{flex:1;padding:9px 0 7px;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px}
+
+/* CUSTOMER APP */
+.ca-pg{background:#0F0A05;min-height:100vh;padding-bottom:70px}
+.ca-hdr{background:linear-gradient(135deg,rgba(232,86,10,.1),rgba(232,86,10,.04));border-bottom:1px solid rgba(232,86,10,.1);padding:14px 17px 16px}
+.ca-ht{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+.ca-lt{font-family:var(--ff-d);font-size:18px;font-weight:700;color:var(--w);font-style:italic}
+.ca-si{position:relative}
+.ca-sic{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;color:rgba(255,255,255,.28)}
+.ca-sinp{width:100%;padding:9px 12px 9px 34px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:var(--w);font-family:var(--ff-b);font-size:12px}
+.ca-sinp::placeholder{color:rgba(255,255,255,.22)}
+.ca-body2{padding:11px 14px 0;max-width:480px;margin:0 auto}
+.ca-flts{display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;margin-bottom:11px}
+.ca-f{flex-shrink:0;padding:5px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.42);font-family:var(--ff-u);font-size:10px;font-weight:700;white-space:nowrap;transition:all .2s}
+.ca-f.a{background:rgba(232,86,10,.14);border-color:rgba(232,86,10,.28);color:var(--pl)}
+.ca-wc{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:17px;padding:14px 15px;margin-bottom:11px;transition:border-color .2s}
+.ca-wc:hover{border-color:rgba(232,86,10,.18)}
+.ca-wt{display:flex;gap:11px;align-items:flex-start;margin-bottom:9px}
+.ca-wav{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-size:15px;font-weight:700;color:var(--w);flex-shrink:0}
+.ca-wname{font-family:var(--ff-d);font-size:15px;font-weight:700;color:var(--w)}
+.ca-wrole{font-family:var(--ff-u);font-size:9px;font-weight:600;color:var(--pl);margin-top:2px;letter-spacing:.5px}
+.ca-wsal{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);border-radius:10px;padding:8px 11px;margin-bottom:8px}
+.ca-wsl{font-family:var(--ff-u);font-size:8px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.22);margin-bottom:2px}
+.ca-wsv{font-family:var(--ff-d);font-size:15px;font-weight:700}
+.ca-wbtns{display:flex;gap:7px}
+.ca-bsv{flex:1;padding:8px;border-radius:9px;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.38);font-family:var(--ff-u);font-size:10px;font-weight:600}
+.ca-breq{flex:2;padding:8px;border-radius:9px;background:linear-gradient(135deg,var(--p),var(--pd));color:var(--w);font-family:var(--ff-u);font-size:10px;font-weight:700;box-shadow:0 3px 11px rgba(232,86,10,.28)}
+.ca-bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,10,5,.94);border-top:1px solid rgba(255,255,255,.07);display:flex;backdrop-filter:blur(10px)}
+.ca-nt{flex:1;padding:9px 0 7px;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px}
+
+/* FOOTER */
+.footer{background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.06);padding:48px 40px 26px}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:32px}
+.fc-t{font-family:var(--ff-u);font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:12px}
+.fc-l{font-size:12px;color:rgba(255,255,255,.28);display:block;margin-bottom:7px;transition:color .2s;font-weight:300}
+.fc-l:hover{color:rgba(255,255,255,.6)}
+.fb{border-top:1px solid rgba(255,255,255,.06);padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:7px}
+.fc{font-family:var(--ff-u);font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.5px}
+
+@media(max-width:900px){
+.hg,.wh-inner{grid-template-columns:1fr;gap:36px}
+#wpc-r{display:none}
+.nav-links{display:none}
+.how-g,.ws-g{grid-template-columns:1fr 1fr}
+.plan-g{grid-template-columns:1fr}
+.al-main{grid-template-columns:1fr}
+.al-metrics{display:none}
+.fg{grid-template-columns:1fr 1fr}
+.ref-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+.hg,.wh-inner{padding:40px 20px}
+section{padding:60px 20px}
+.stats,.calc-sec,.footer{padding-left:20px;padding-right:20px}
+.how-g,.ws-g,.rg{grid-template-columns:1fr}
+.c-nav{padding:0 20px}
+}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- ═══════ CUSTOMER LANDING ═══════ -->
+<div id="page-customer-landing" class="page active">
+<nav class="c-nav" id="c-nav">
+  <div class="ni">
+    <div class="logo-w" id="logo-click">
+      <div class="logo-m"><em>OM</em></div>
+      <div><div class="logo-t">O MY HELP</div><div class="logo-s">HOUSE HELP</div></div>
+    </div>
+    <div class="nav-links">
+      <a href="#sec-roles">Staff</a>
+      <a href="#sec-how">How It Works</a>
+      <a href="#sec-trust">Why Us</a>
+      <a href="#sec-pricing">Pricing</a>
+      <a href="#sec-faq">FAQ</a>
+    </div>
+    <div style="display:flex;gap:9px">
+      <button class="btn-g" onclick="gotoPage('page-worker-landing')">For Workers</button>
+      <button class="btn-p" onclick="showAuth('customer')">Find Staff →</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="hg">
+    <div style="animation:fadeUp .7s ease forwards">
+      <div class="eyebrow">
+        <div style="display:flex;align-items:center;gap:8px"><div class="ebdot"></div><span style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--pl);letter-spacing:1.5px">HOUSE HELP — DONE DIFFERENTLY.</span></div>
+        <span style="font-family:var(--ff-u);font-size:10px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:1.5px;padding-left:13px">NO AGENTS. NO WAITING. NO COMPROMISE.</span>
+      </div>
+      <h1 class="h1">Agents take weeks,<br/>charge thousands,<br/><em>and disappear.</em></h1>
+      <p class="hero-p">We take minutes, charge once, and guarantee replacements. Verified maids, cooks, drivers, nannies and caregivers — matched to your home and sent to your WhatsApp instantly.</p>
+      <div class="hero-btns">
+        <button class="btn-p" style="font-size:15px;padding:14px 30px" onclick="showAuth('customer')">Start Free — 7 Days →</button>
+        <button class="btn-g" onclick="document.getElementById('sec-how').scrollIntoView({behavior:'smooth'})">How It Works</button>
+      </div>
+      <div class="hero-social">
+        <div class="h-avs">
+          <div class="h-av" style="background:linear-gradient(135deg,#E8560A,#B83D00);margin-left:0">SD</div>
+          <div class="h-av" style="background:linear-gradient(135deg,#0A8A72,#076B59);margin-left:-9px">RK</div>
+          <div class="h-av" style="background:linear-gradient(135deg,#C49010,#A07000);margin-left:-9px">MS</div>
+          <div class="h-av" style="background:linear-gradient(135deg,#E8560A,#B83D00);margin-left:-9px">AR</div>
+        </div>
+        <div>
+          <div style="color:var(--goldl);font-size:12px;letter-spacing:2px">★★★★★</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.35)">Trusted by <strong style="color:rgba(255,255,255,.65)">3,847</strong> households</div>
+        </div>
+      </div>
+    </div>
+    <div id="wpc-r" style="animation:fadeUp .9s ease forwards;position:relative">
+      <div class="wpc">
+        <div class="wpc-h">
+          <div class="wpc-badge">INFO 3/3 · FULLY VERIFIED</div>
+          <div class="wpc-prof">
+            <div class="wpc-av">SD</div>
+            <div>
+              <div class="wpc-name">Sunita Devi</div>
+              <div class="wpc-role">👨‍🍳 COOK · SAKET, DELHI</div>
+              <div style="color:var(--goldl);font-size:11px;margin-top:4px;letter-spacing:2px">★★★★★ <span style="color:rgba(255,255,255,.28);font-size:10px">4.9 (34)</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="wpc-b">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px">
+            <span class="pill" style="background:rgba(13,196,158,.1);color:#0DC49E;border:1px solid rgba(13,196,158,.18)">✓ Aadhaar</span>
+            <span class="pill" style="background:rgba(13,196,158,.1);color:#0DC49E;border:1px solid rgba(13,196,158,.18)">✓ References</span>
+            <span class="pill" style="background:rgba(13,196,158,.1);color:#0DC49E;border:1px solid rgba(13,196,158,.18)">✓ Video</span>
+            <span class="pill" style="background:rgba(13,196,158,.1);color:#0DC49E;border:1px solid rgba(13,196,158,.18)">🟢 Market Rate</span>
+          </div>
+          <div class="wpc-sal">
+            <div><div class="wpc-sl">CURRENT</div><div class="wpc-sv">₹14,000/mo</div></div>
+            <div style="text-align:right"><div class="wpc-sl">EXPECTED</div><div class="wpc-sv g">₹18,000/mo</div></div>
+          </div>
+          <button style="width:100%;padding:12px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--pd));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:13px;box-shadow:0 4px 16px rgba(232,86,10,.38)" onclick="showAuth('customer')">Request Interview →</button>
+        </div>
+      </div>
+      <div class="wpc-72">⚡ Available Now</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="si">
+    <div class="sit"><div class="sv" id="stat-workers">12,483+</div><div class="sl2">VERIFIED WORKERS</div></div>
+    <div class="sit"><div class="sv" id="stat-households">3,847+</div><div class="sl2">HOUSEHOLDS</div></div>
+  </div>
+</div>
+
+<!-- ROLES -->
+<section style="background:var(--ink)" id="sec-roles">
+  <div class="sec">
+    <div class="reveal">
+      <div class="sec-lbl">STAFF WE FIND</div>
+      <h2 class="sec-t">Every role.<br/><em>Fully verified.</em></h2>
+      <p class="sec-sub">From a daily maid to a full-time house manager — same rigorous verification, every time.</p>
+      <div style="font-family:var(--ff-u);font-size:9px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,.25);margin-top:12px">📊 SALARY RANGES BASED ON CURRENT PLATFORM DATA</div>
+    </div>
+    <div class="rg">
+      <div class="rc reveal" onclick="showAuth('customer')"><div class="rc-icon">🏠</div><div class="rc-t">Maid</div><p class="rc-d">Daily cleaning, cooking, laundry</p><div class="rc-s" id="sal-maid">₹14,000–₹18,000/mo</div><div class="rc-a">→</div></div>
+      <div class="rc reveal" onclick="showAuth('customer')"><div class="rc-icon">👨‍🍳</div><div class="rc-t">Cook</div><p class="rc-d">North Indian, South Indian, Continental</p><div class="rc-s" id="sal-cook">₹18,000–₹25,000/mo</div><div class="rc-a">→</div></div>
+      <div class="rc reveal" onclick="showAuth('customer')"><div class="rc-icon">🚗</div><div class="rc-t">Driver</div><p class="rc-d">Full-time personal driver, city-experienced</p><div class="rc-s" id="sal-driver">₹20,000–₹30,000/mo</div><div class="rc-a">→</div></div>
+      <div class="rc reveal" onclick="showAuth('customer')"><div class="rc-icon">👶</div><div class="rc-t">Nanny</div><p class="rc-d">Infant to school-age, trained and calm</p><div class="rc-s" id="sal-nanny">₹18,000–₹30,000/mo</div><div class="rc-a">→</div></div>
+      <div class="rc reveal" onclick="showAuth('customer')"><div class="rc-icon">❤️</div><div class="rc-t">Elderly Caregiver</div><p class="rc-d">Post-surgery, mobility, companionship</p><div class="rc-s" id="sal-caregiver">₹20,000–₹35,000/mo</div><div class="rc-a">→</div></div>
+      <div class="rc reveal" onclick="showAuth('customer')"><div class="rc-icon">📋</div><div class="rc-t">House Manager</div><p class="rc-d">Staff coordination, budgeting, errands</p><div class="rc-s" id="sal-manager">₹20,000–₹50,000/mo</div><div class="rc-a">→</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background:linear-gradient(180deg,var(--ink) 0%,rgba(28,17,8,.5) 100%)" id="sec-how">
+  <div class="sec">
+    <div class="reveal">
+      <div class="sec-lbl">HOW IT WORKS</div>
+      <h2 class="sec-t">Simple process.<br/><em>Trusted results.</em></h2>
+      <div class="htog">
+        <button class="hbtn a" id="hbtn-hh" onclick="switchHow('hh')">🏡 I need staff</button>
+        <button class="hbtn" id="hbtn-wk" onclick="switchHow('wk')">👷 I am a worker</button>
+      </div>
+    </div>
+    <div class="how-g reveal" id="how-steps">
+      <div class="how-s"><div class="how-num">1</div><div class="how-ic">💬</div><div class="how-t">Tell us what you need</div><p class="how-d">WhatsApp or web — role, area, budget. 2 minutes.</p></div>
+      <div class="how-s"><div class="how-num">2</div><div class="how-ic">📱</div><div class="how-t">2 profiles on WhatsApp instantly</div><p class="how-d">Curated and matched. No browsing needed. We do the work.</p></div>
+      <div class="how-s"><div class="how-num">3</div><div class="how-ic">🤝</div><div class="how-t">Worker confirms interest</div><p class="how-d">You never chase. Worker confirms — contact shared.</p></div>
+      <div class="how-s"><div class="how-num">4</div><div class="how-ic">🛡️</div><div class="how-t">Hire with full protection</div><p class="how-d">Free replacement within 15 days if worker leaves. Pro-rata refund if we cannot replace.</p></div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:44px">
+      <button class="btn-p" id="how-cta" style="font-size:14px;padding:13px 30px" onclick="showAuth('customer')">Find My Staff →</button>
+    </div>
+  </div>
+</section>
+
+<!-- REFUND POLICY -->
+<section style="background:var(--ink2)" id="sec-refund">
+  <div class="sec" style="max-width:900px;margin:0 auto">
+    <div class="reveal" style="text-align:center;margin-bottom:36px">
+      <div class="sec-lbl" style="display:flex;justify-content:center">IF SOMETHING GOES WRONG</div>
+      <h2 class="sec-t" style="text-align:center">What if the worker<br/><em>leaves?</em></h2>
+    </div>
+    <div class="reveal" style="background:rgba(13,196,158,.06);border:1px solid rgba(13,196,158,.15);border-radius:20px;padding:32px;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:28px">
+        <div style="text-align:center;padding:16px;border-right:1px solid rgba(255,255,255,.07)">
+          <div style="font-size:28px;margin-bottom:8px">🔄</div>
+          <div style="font-family:var(--ff-d);font-size:16px;font-weight:700;color:var(--w);margin-bottom:5px">Step 1</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.65;font-weight:300">We get 15 days to find you a free replacement</div>
+        </div>
+        <div style="text-align:center;padding:16px;border-right:1px solid rgba(255,255,255,.07)">
+          <div style="font-size:28px;margin-bottom:8px">✅</div>
+          <div style="font-family:var(--ff-d);font-size:16px;font-weight:700;color:var(--w);margin-bottom:5px">If replaced</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.65;font-weight:300">Case closed. No refund needed. Problem solved.</div>
+        </div>
+        <div style="text-align:center;padding:16px">
+          <div style="font-size:28px;margin-bottom:8px">💰</div>
+          <div style="font-family:var(--ff-d);font-size:16px;font-weight:700;color:var(--w);margin-bottom:5px">If not replaced</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.65;font-weight:300">Automatic refund. No paperwork. No calls. No chasing.</div>
+        </div>
+      </div>
+      <div style="font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:14px">Refund Schedule — placement fee only</div>
+      <div class="ref-grid">
+        <div class="ref-cell"><div class="ref-mo">MONTH 1</div><div class="ref-pct" style="color:#0DC49E">70%</div></div>
+        <div class="ref-cell"><div class="ref-mo">MONTH 2</div><div class="ref-pct" style="color:#0DC49E">60%</div></div>
+        <div class="ref-cell"><div class="ref-mo">MONTH 3</div><div class="ref-pct" style="color:#0DC49E">50%</div></div>
+        <div class="ref-cell"><div class="ref-mo">MONTH 4</div><div class="ref-pct" style="color:#F0B830">40%</div></div>
+        <div class="ref-cell"><div class="ref-mo">MONTH 5</div><div class="ref-pct" style="color:#F0B830">20%</div></div>
+        <div class="ref-cell"><div class="ref-mo">MONTH 6</div><div class="ref-pct" style="color:#E8560A">10%</div></div>
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.28);text-align:center;font-weight:300">No refund after Month 6. Replacement always attempted regardless of timing.</div>
+    </div>
+    <div class="reveal" style="background:rgba(232,86,10,.06);border:1px solid rgba(232,86,10,.15);border-radius:14px;padding:18px 24px;text-align:center">
+      <div style="font-family:var(--ff-d);font-size:18px;font-weight:700;color:var(--w);margin-bottom:5px">Pay once when we place someone. Nothing more until you need us again.</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.35);font-weight:300">No monthly fees. No ongoing charges. No subscription commissions on your worker's salary.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section style="background:var(--ink)" id="sec-trust">
+  <div class="sec">
+    <div class="reveal"><div class="sec-lbl">WHY O MY HELP</div><h2 class="sec-t">What makes us<br/><em>different.</em></h2></div>
+    <div class="tg">
+      <div class="tc j reveal"><div style="font-size:22px;margin-bottom:9px">🛡️</div><div style="font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:7px">Free Replacement First</div><p style="font-size:12px;color:rgba(255,255,255,.72);line-height:1.65;font-weight:300">Worker leaves within 6 months? We find a free replacement in 15 days before any refund is discussed.</p></div>
+      <div class="tc l reveal"><div style="font-size:22px;margin-bottom:9px">🪪</div><div style="font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:7px">Aadhaar-Verified</div><p style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">Every worker completes Aadhaar OTP before going live. No fake profiles. Ever.</p></div>
+      <div class="tc l reveal"><div style="font-size:22px;margin-bottom:9px">📱</div><div style="font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:7px">Matched to Your WhatsApp</div><p style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">2 curated profiles sent instantly. No browsing. No searching. We do the work.</p></div>
+      <div class="tc l reveal"><div style="font-size:22px;margin-bottom:9px">💰</div><div style="font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:7px">Zero Middlemen</div><p style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">No agent. No ongoing commissions. One transparent 6% placement fee.</p></div>
+      <div class="tc l reveal"><div style="font-size:22px;margin-bottom:9px">📹</div><div style="font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:7px">Video Introduction</div><p style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">See and hear the worker before deciding. 30-60 second intro video on INFO 3/3 profiles.</p></div>
+      <div class="tc l reveal"><div style="font-size:22px;margin-bottom:9px">📊</div><div style="font-family:var(--ff-d);font-size:17px;font-weight:700;color:var(--w);margin-bottom:7px">Salary Benchmarks</div><p style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">Know if you are offering fair market rate for every role and area. Premium and Elite feature.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ETHICAL EMPLOYER -->
+<section style="background:var(--ink2)">
+  <div class="sec" style="max-width:900px;margin:0 auto">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-lbl" style="display:flex;justify-content:center">FOR THE PEOPLE YOU INVITE INTO YOUR HOME</div>
+      <h2 class="sec-t" style="text-align:center">Good for your home.<br/><em>Good for them too.</em></h2>
+      <p style="font-size:15px;color:rgba(255,255,255,.38);margin:14px auto 36px;font-weight:300;max-width:520px">Every worker on O MY HELP is treated with dignity — not as a commodity.</p>
+    </div>
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:28px">
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px 20px;display:flex;gap:14px;align-items:flex-start">
+        <div style="font-size:22px;color:var(--jadel);flex-shrink:0">✓</div>
+        <div><div style="font-family:var(--ff-u);font-size:12px;font-weight:700;color:var(--w);margin-bottom:5px">Full salary paid directly</div><div style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">Zero deductions. Zero agent cuts. Worker gets every rupee they earn.</div></div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px 20px;display:flex;gap:14px;align-items:flex-start">
+        <div style="font-size:22px;color:var(--jadel);flex-shrink:0">✓</div>
+        <div><div style="font-family:var(--ff-u);font-size:12px;font-weight:700;color:var(--w);margin-bottom:5px">No placement fee to workers</div><div style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">Workers never pay to join or find work. Ever. Completely free for them.</div></div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px 20px;display:flex;gap:14px;align-items:flex-start">
+        <div style="font-size:22px;color:var(--jadel);flex-shrink:0">✓</div>
+        <div><div style="font-family:var(--ff-u);font-size:12px;font-weight:700;color:var(--w);margin-bottom:5px">Fully verified before placement</div><div style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">Background checked, Aadhaar confirmed. Safe for your home.</div></div>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;font-family:var(--ff-d);font-size:20px;font-style:italic;color:rgba(255,255,255,.5)">"When your worker thrives, your home does too."</div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="background:var(--ink)">
+  <div class="sec">
+    <div class="reveal"><div class="sec-lbl">REAL STORIES</div><h2 class="sec-t">What people<br/><em>say.</em></h2></div>
+    <div class="test-g">
+      <div class="test-c reveal"><div class="test-stars">★★★★★</div><p class="test-t">"Found our cook in 48 hours. 14 months later she is still with us. The refund guarantee gave us confidence."</p><div class="test-n">Ananya Kapoor</div><div class="test-l">📍 VASANT KUNJ · PREMIUM MEMBER</div></div>
+      <div class="test-c reveal"><div class="test-stars">★★★★★</div><p class="test-t">"Pehle agent 15 din baad bhi nahi bataata tha. O MY HELP ne WhatsApp pe profiles bhej diye turant."</p><div class="test-n">Sunita Devi</div><div class="test-l">📍 SAKET, DELHI · COOK · 8 YRS</div></div>
+      <div class="test-c reveal"><div class="test-stars">★★★★★</div><p class="test-t">"INFO 3/3 verified House Manager — full profile, video intro. Only O MY HELP did this properly."</p><div class="test-n">Rohan Mehta</div><div class="test-l">📍 GURUGRAM · ELITE MEMBER</div></div>
+      <div class="test-c reveal"><div class="test-stars">★★★★★</div><p class="test-t">"Koi agent nahi, koi commission nahi. O MY HELP ne mujhe stable kaam aur dignity dono diye."</p><div class="test-n">Ramesh Kumar</div><div class="test-l">📍 DLF PHASE 3 · DRIVER · 12 YRS</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section style="background:var(--ink2)" id="sec-pricing">
+  <div class="sec" style="max-width:1100px">
+    <div class="reveal" style="text-align:center;margin-bottom:32px">
+      <div class="sec-lbl" style="display:flex;justify-content:center">INTRODUCTORY LAUNCH OFFER</div>
+      <h2 class="sec-t" style="text-align:center">Simple plans.<br/><em>No surprises.</em></h2>
+      <div style="margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:rgba(214,53,80,.1);border:1px solid rgba(214,53,80,.2);border-radius:12px;padding:10px 18px">
+        <span style="font-size:14px">⏳</span>
+        <span style="font-family:var(--ff-u);font-size:12px;font-weight:700;color:var(--rose)">OFFER ENDS IN: </span>
+        <span style="font-family:var(--ff-d);font-size:18px;font-weight:700;color:var(--w)" id="countdown-timer">47:59:59</span>
+      </div>
+    </div>
+    <div class="trial-b reveal">
+      <div>
+        <div style="font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w)">🎁 Start Free Trial — Lock This Price for 30 Days</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.38);margin-top:4px;font-weight:300">No credit card. Trial starts instantly. 2 matched profiles sent to WhatsApp on Day 1.</div>
+      </div>
+      <button class="btn-p" onclick="showAuth('customer')">Start Free Trial →</button>
+    </div>
+    <div class="plan-g reveal">
+      <div class="plan">
+        <div class="plan-n">Basic</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
+          <div class="plan-p">₹999</div>
+          <div style="font-family:var(--ff-d);font-size:18px;color:rgba(255,255,255,.25);text-decoration:line-through">₹1,499</div>
+        </div>
+        <div class="plan-per">per year · workers ₹8k–₹20k/mo</div>
+        <div class="plan-feats">
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>2 matched profiles sent instantly to WhatsApp</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>Unlimited app browsing</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>INFO 1/3, 2/3, 3/3 workers</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>Salary signal on every worker card</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>6% placement fee · Full refund protection</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>15-day free replacement guarantee</div>
+        </div>
+        <button class="btn-g" onclick="showAuth('customer')">Start Free Trial — Lock ₹999</button>
+      </div>
+      <div class="plan pop">
+        <div class="pop-badge">MOST POPULAR</div>
+        <div class="plan-n">Premium</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
+          <div class="plan-p">₹2,999</div>
+          <div style="font-family:var(--ff-d);font-size:18px;color:rgba(255,255,255,.25);text-decoration:line-through">₹3,999</div>
+        </div>
+        <div class="plan-per">per year · workers ₹8k–₹36k/mo</div>
+        <div class="plan-feats">
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>Everything in Basic</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>INFO 2/3+ workers · up to ₹36k salary</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>2 BG checks + 1 police verification/yr</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>Full salary benchmark report</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>Worker Score visible</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--p)">✓</span>5 replacement profiles within 15 days</div>
+        </div>
+        <button class="btn-p" onclick="showAuth('customer')">Start Free Trial — Lock ₹2,999 →</button>
+      </div>
+      <div class="plan">
+        <div class="plan-n" style="color:var(--gold)">Elite</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
+          <div class="plan-p" style="color:var(--gold)">₹7,999</div>
+          <div style="font-family:var(--ff-d);font-size:18px;color:rgba(255,255,255,.25);text-decoration:line-through">₹9,999</div>
+        </div>
+        <div class="plan-per">per year · workers ₹36k+/mo</div>
+        <div class="plan-feats">
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--gold)">✓</span>Everything in Premium</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--gold)">✓</span>All salary tiers including ₹36k+ workers</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--gold)">✓</span>3 BG checks + 2 police verifications/yr</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--gold)">✓</span>INFO 3/3 workers prioritised first</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--gold)">✓</span>International workers — Phase 2</div>
+          <div class="plan-feat"><span class="plan-chk" style="color:var(--gold)">✓</span>Free consultation call to get started</div>
+        </div>
+        <button class="btn-g" style="border-color:rgba(196,144,16,.3);color:var(--goldl)" onclick="showAuth('customer')">Book Free Consultation →</button>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:18px;font-size:12px;color:rgba(255,255,255,.25);font-weight:300">
+      All plans: 6% flat placement fee · Extra BG check ₹500 · Extra police verification ₹1,000 · Price locked 30 days after trial ends
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background:var(--ink)" id="sec-faq">
+  <div class="sec" style="max-width:760px;margin:0 auto">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <div class="sec-lbl" style="display:flex;justify-content:center">QUESTIONS</div>
+      <h2 class="sec-t" style="text-align:center">Common<br/><em>questions.</em></h2>
+    </div>
+    <div id="faq-list"></div>
+  </div>
+</section>
+
+<!-- WORKER STRIP -->
+<div style="padding:72px 40px;background:linear-gradient(135deg,rgba(232,86,10,.07),rgba(10,138,114,.05));border-top:1px solid rgba(255,255,255,.06)">
+  <div style="max-width:760px;margin:0 auto;text-align:center">
+    <div class="sec-lbl" style="display:flex;justify-content:center;margin-bottom:14px">FOR DOMESTIC WORKERS</div>
+    <h2 style="font-family:var(--ff-d);font-size:clamp(26px,4vw,46px);font-weight:700;color:var(--w);margin-bottom:11px;line-height:1.15">Register Free.<br/><em style="color:var(--p)">Find Stable Work Near You.</em></h2>
+    <p style="font-size:14px;color:rgba(255,255,255,.38);margin-bottom:26px;font-weight:300">No agent. No commission cuts. Direct placement. Honest work.</p>
+    <button class="btn-p" style="font-size:14px;padding:13px 30px" onclick="gotoPage('page-worker-landing')">Register as Worker — Free →</button>
+  </div>
+</div>
+
+<footer class="footer">
+  <div style="max-width:1280px;margin:0 auto">
+    <div class="fg">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:13px">
+          <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-size:12px;font-weight:700;color:var(--w);font-style:italic">OM</div>
+          <div><div style="font-family:var(--ff-d);font-size:15px;font-weight:700;color:var(--w)">O MY HELP</div><div style="font-family:var(--ff-u);font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.2)">HOUSE HELP</div></div>
+        </div>
+        <p style="font-size:12px;color:rgba(255,255,255,.22);line-height:1.8;max-width:210px;font-weight:300">India's trusted house help network. Verified workers. Pro-rata refund. No middlemen.</p>
+      </div>
+      <div><div class="fc-t">HOUSEHOLDS</div><a class="fc-l" href="#">Find a Worker</a><a class="fc-l" href="#">Pricing</a><a class="fc-l" href="#">Free Trial</a><a class="fc-l" href="#">How It Works</a></div>
+      <div><div class="fc-t">WORKERS</div><a class="fc-l" href="#">Register Free</a><a class="fc-l" href="#">Job Alerts</a><a class="fc-l" href="#">Support</a></div>
+      <div><div class="fc-t">COMPANY</div><a class="fc-l" href="#">About</a><a class="fc-l" href="#">Blog</a><a class="fc-l" href="#">Privacy</a><a class="fc-l" href="#" onclick="gotoPage('page-admin-landing');return false">Admin</a></div>
+    </div>
+    <div class="fb"><div class="fc">© 2025 O MY HELP — HOUSE HELP DONE RIGHT</div><div style="display:flex;gap:14px"><a class="fc" href="#">PRIVACY</a><a class="fc" href="#">TERMS</a><a class="fc" href="#">REFUNDS</a></div></div>
+  </div>
+</footer>
+</div>
+
+<!-- ═══════ WORKER LANDING ═══════ -->
+<div id="page-worker-landing" class="page">
+<nav class="c-nav" style="background:rgba(5,8,3,.96);border-bottom:1px solid rgba(13,196,158,.09)">
+  <div class="ni">
+    <div class="logo-w" onclick="gotoPage('page-customer-landing')">
+      <div class="logo-m"><em>OM</em></div>
+      <div><div class="logo-t">O MY HELP</div><div class="logo-s">WORKERS</div></div>
+    </div>
+    <div class="nav-links"><a href="#wl-steps" style="color:rgba(255,255,255,.5)">How to Earn</a><a href="#wl-calc" style="color:rgba(255,255,255,.5)">Calculator</a></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn-g" style="border-color:rgba(13,196,158,.22);color:var(--jadel)" onclick="gotoPage('page-customer-landing')">For Households</button>
+      <button style="padding:12px 24px;border-radius:12px;background:linear-gradient(135deg,var(--jade),var(--jaded));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:13px;box-shadow:0 4px 18px rgba(10,138,114,.38)" onclick="showAuth('worker')">Register Free →</button>
+    </div>
+  </div>
+</nav>
+<section class="w-hero">
+  <div class="w-acc"></div>
+  <div class="wh-inner">
+    <div style="animation:fadeUp .7s ease forwards">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(13,196,158,.09);border:1px solid rgba(13,196,158,.18);border-radius:24px;padding:5px 13px;margin-bottom:22px">
+        <div style="width:5px;height:5px;border-radius:50%;background:var(--jadel);animation:pulse 2s infinite"></div>
+        <span style="font-family:var(--ff-u);font-size:9px;font-weight:700;color:var(--jadel);letter-spacing:1.5px">FREE REGISTRATION · JOIN NOW</span>
+      </div>
+      <h1 style="font-family:var(--ff-d);font-size:clamp(42px,5vw,70px);font-weight:700;line-height:1.05;color:var(--w);margin-bottom:16px">Kaam Bhi.<br/><em style="color:var(--jadel);font-style:italic">Kamai Bhi.</em></h1>
+      <p style="font-size:16px;color:rgba(255,255,255,.44);line-height:1.82;margin-bottom:30px;max-width:460px;font-weight:300">Register free. Complete your profile. Get matched to stable work near you — no agent, no commission.</p>
+      <div style="display:flex;gap:11px;flex-wrap:wrap;margin-bottom:36px">
+        <button style="padding:14px 30px;border-radius:12px;background:linear-gradient(135deg,var(--jade),var(--jaded));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:14px;box-shadow:0 4px 18px rgba(10,138,114,.38)" onclick="showAuth('worker')">Register Free — Abhi →</button>
+        <button class="btn-g" onclick="document.getElementById('wl-steps').scrollIntoView({behavior:'smooth'})">Kaisa kaam karta hai?</button>
+      </div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:7px"><span style="font-size:18px">💰</span><span style="font-size:12px;color:rgba(255,255,255,.38)">Onboarding rewards on completion</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><span style="font-size:18px">📅</span><span style="font-size:12px;color:rgba(255,255,255,.38)">Monday payout</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><span style="font-size:18px">🤝</span><span style="font-size:12px;color:rgba(255,255,255,.38)">No agent. No fees.</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section style="background:#0A0F08" id="wl-steps">
+  <div class="sec">
+    <div class="reveal">
+      <div class="sec-lbl" style="color:var(--jadel)">4 STEPS</div>
+      <h2 class="sec-t">4 steps.<br/><em style="color:var(--jadel)">Simple. Free.</em></h2>
+    </div>
+    <div class="ws-g reveal">
+      <div class="ws"><div class="ws-bg-n">1</div><div style="display:inline-flex;align-items:center;background:rgba(13,196,158,.1);border-radius:20px;padding:3px 10px;font-family:var(--ff-u);font-size:9px;font-weight:700;color:var(--jadel);letter-spacing:1px;margin-bottom:12px">FREE</div><div style="font-size:26px;margin-bottom:10px">📱</div><div style="font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w);margin-bottom:7px">Register</div><p style="font-size:13px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">Sirf phone number + OTP. 30 seconds.</p><div style="font-family:var(--ff-d);font-size:20px;font-weight:700;color:var(--jadel);margin-top:13px"</div>
+      <div class="ws"><div class="ws-bg-n">2</div><div style="display:inline-flex;align-items:center;background:rgba(13,196,158,.1);border-radius:20px;padding:3px 10px;font-family:var(--ff-u);font-size:9px;font-weight:700;color:var(--jadel);letter-spacing:1px;margin-bottom:12px">COMPLETE</div><div style="font-size:26px;margin-bottom:10px">📝</div><div style="font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w);margin-bottom:7px">INFO 1/3</div><p style="font-size:13px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">WhatsApp par simple questions. 8 minutes. Profile live.</p><div style="font-family:var(--ff-d);font-size:20px;font-weight:700;color:var(--jadel);margin-top:13px">Profile goes live</div></div>
+      <div class="ws"><div class="ws-bg-n">3</div><div style="display:inline-flex;align-items:center;background:rgba(13,196,158,.1);border-radius:20px;padding:3px 10px;font-family:var(--ff-u);font-size:9px;font-weight:700;color:var(--jadel);letter-spacing:1px;margin-bottom:12px">COMPLETE</div><div style="font-size:26px;margin-bottom:10px">⭐</div><div style="font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w);margin-bottom:7px">INFO 2/3</div><p style="font-size:13px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">References, skills, employment history. Zyada matches.</p><div style="font-family:var(--ff-d);font-size:20px;font-weight:700;color:var(--jadel);margin-top:13px">More matches</div></div>
+      <div class="ws"><div class="ws-bg-n">4</div><div style="display:inline-flex;align-items:center;background:rgba(13,196,158,.1);border-radius:20px;padding:3px 10px;font-family:var(--ff-u);font-size:9px;font-weight:700;color:var(--jadel);letter-spacing:1px;margin-bottom:12px">COMPLETE</div><div style="font-size:26px;margin-bottom:10px">🏅</div><div style="font-family:var(--ff-d);font-size:19px;font-weight:700;color:var(--w);margin-bottom:7px">INFO 3/3</div><p style="font-size:13px;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300">Documents, video intro. O MY HELP review. Top households sirf INFO 3/3 ko hire karte hain.</p><div style="font-family:var(--ff-d);font-size:20px;font-weight:700;color:var(--jadel);margin-top:13px">Top household access</div></div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:44px">
+      <button style="padding:14px 34px;border-radius:12px;background:linear-gradient(135deg,var(--jade),var(--jaded));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:14px;box-shadow:0 4px 18px rgba(10,138,114,.38)" onclick="showAuth('worker')">Shuru Karo — Bilkul Free →</button>
+    </div>
+  </div>
+</section>
+
+<div class="calc-sec" id="wl-calc">
+  <div style="max-width:700px;margin:0 auto;text-align:center">
+    <div class="reveal">
+      <div class="sec-lbl" style="color:var(--pl);display:flex;justify-content:center">REFERRAL CALCULATOR</div>
+      <h2 style="font-family:var(--ff-d);font-size:clamp(26px,4vw,46px);font-weight:700;color:var(--w);margin-bottom:11px;line-height:1.15">Kitne dost refer karoge?</h2>
+      <p style="font-size:14px;color:rgba(255,255,255,.38);margin-bottom:24px;font-weight:300">Ek dost refer karo jo INFO 1/3 complete kare — ek baar ka bonus. Seedha bank mein.</p>
+      <input class="calc-slider" type="range" min="1" max="50" value="5" id="ref-sl" oninput="updateCalc(this.value)"/>
+      <div style="font-family:var(--ff-u);font-size:13px;color:rgba(255,255,255,.38)" id="ref-sl-l">5 dost refer karo</div>
+      <div class="calc-disp" id="ref-cd">5 referrals</div>
+      <p style="font-size:12px;color:rgba(255,255,255,.28);font-weight:300">Sirf INFO 1/3 complete karne par. Monday ko directly bank mein.</p>
+      <button style="margin-top:22px;padding:12px 26px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--pd));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:13px;box-shadow:0 4px 16px rgba(232,86,10,.38)" onclick="showAuth('worker')">Register and Start Referring →</button>
+    </div>
+  </div>
+</div>
+
+<section style="background:#0A0F08">
+  <div class="sec">
+    <div class="reveal"><div class="sec-lbl" style="color:var(--jadel)">SUCCESS STORIES</div><h2 class="sec-t">Unki<br/><em style="color:var(--jadel)">baatein.</em></h2></div>
+    <div class="test-g" style="margin-top:44px">
+      <div class="test-c reveal" style="background:rgba(13,196,158,.04);border-color:rgba(13,196,158,.09)"><div class="test-stars" style="color:var(--jadel)">★★★★★</div><p class="test-t">"O MY HELP ne mujhe 2 din mein job di. Koi agent nahi, koi commission nahi. Salary seedha bank mein."</p><div class="test-n">Sunita Devi</div><div class="test-l">👨‍🍳 COOK · SAKET, DELHI · 8 YRS</div></div>
+      <div class="test-c reveal" style="background:rgba(13,196,158,.04);border-color:rgba(13,196,158,.09)"><div class="test-stars" style="color:var(--jadel)">★★★★★</div><p class="test-t">"Pehle agent ₹3,000 commission leta tha. Yahan free hai. INFO 3/3 se top households milte hain."</p><div class="test-n">Ramesh Kumar</div><div class="test-l">🚗 DRIVER · DLF GURGAON · 12 YRS</div></div>
+      <div class="test-c reveal" style="background:rgba(13,196,158,.04);border-color:rgba(13,196,158,.09)"><div class="test-stars" style="color:var(--jadel)">★★★★★</div><p class="test-t">"Maine 8 dosto ko refer kiya. ₹400 extra mila. Aur sab ko achha kaam bhi mila."</p><div class="test-n">Meena Sharma</div><div class="test-l">🏠 MAID · VASANT KUNJ · 6 YRS</div></div>
+    </div>
+    <div style="text-align:center;margin-top:44px">
+      <button style="padding:14px 34px;border-radius:12px;background:linear-gradient(135deg,var(--jade),var(--jaded));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:14px;box-shadow:0 4px 18px rgba(10,138,114,.38)" onclick="showAuth('worker')">Aap Bhi Shuru Karo →</button>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ═══════ ADMIN LOGIN ═══════ -->
+<div id="page-admin-landing" class="page">
+<div class="al-wrap">
+  <div class="al-hdr">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--w);font-style:italic">OM</div>
+      <div><div style="font-family:var(--ff-d);font-size:15px;font-weight:700;color:var(--w)">O MY HELP</div><div style="font-family:var(--ff-u);font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.2)">ADMIN CONSOLE</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:13px">
+      <div class="live-b"><div class="live-dot"></div>SYSTEM LIVE</div>
+      <span style="font-family:var(--ff-u);font-size:10px;color:rgba(255,255,255,.2)">Delhi NCR Operations</span>
+    </div>
+  </div>
+  <div class="al-main">
+    <div class="al-metrics">
+      <div style="font-family:var(--ff-u);font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.22);margin-bottom:6px">LIVE SYSTEM METRICS</div>
+      <div class="al-m"><div><div class="al-ml">TOTAL WORKERS</div><div class="al-mv">12,483</div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--jadel);margin-top:3px">↑ +234 this week</div></div><div style="font-size:26px;opacity:.6">👥</div></div>
+      <div class="al-m"><div><div class="al-ml">HOUSEHOLDS</div><div class="al-mv">3,847</div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--jadel);margin-top:3px">↑ +89 this week</div></div><div style="font-size:26px;opacity:.6">🏠</div></div>
+      <div class="al-m"><div><div class="al-ml">PLACEMENTS MTD</div><div class="al-mv">67</div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--jadel);margin-top:3px">↑ On track</div></div><div style="font-size:26px;opacity:.6">✅</div></div>
+      <div class="al-m"><div><div class="al-ml">MONDAY PAYOUT</div><div class="al-mv">₹67,400</div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--goldl);margin-top:3px">⚠ Pending approval</div></div><div style="font-size:26px;opacity:.6">💰</div></div>
+      <div class="al-m"><div><div class="al-ml">INFO 3/3 REVIEWS</div><div class="al-mv">3</div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--rose);margin-top:3px">⚠ Overdue</div></div><div style="font-size:26px;opacity:.6">💎</div></div>
+    </div>
+    <div class="al-panel">
+      <div style="font-family:var(--ff-d);font-size:34px;font-weight:700;color:var(--w);margin-bottom:5px">Admin Console</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.28);margin-bottom:32px;line-height:1.65;font-weight:300">Secure access for O MY HELP operations team. All actions are logged.</div>
+      <div class="al-roles">
+        <button class="al-rb a" id="alr-admin" onclick="setARole('admin')">Admin</button>
+        <button class="al-rb" id="alr-manager" onclick="setARole('manager')">Manager</button>
+        <button class="al-rb" id="alr-support" onclick="setARole('support')">Support</button>
+      </div>
+      <div class="al-ig"><label class="al-lbl">MOBILE NUMBER</label><input class="al-inp" type="tel" id="al-ph" maxlength="10" placeholder="10-digit registered mobile" oninput="updateABtn()"/></div>
+      <div class="al-ig"><label class="al-lbl">4-DIGIT PIN</label><input class="al-inp" type="password" id="al-pin" maxlength="4" placeholder="••••" style="font-size:22px;letter-spacing:9px;text-align:center" oninput="updateABtn()"/></div>
+      <div id="al-err" style="background:rgba(214,53,80,.09);border:1px solid rgba(214,53,80,.2);border-radius:9px;padding:9px 13px;font-family:var(--ff-u);font-size:11px;color:#FF8090;font-weight:600;margin-bottom:8px;display:none"></div>
+      <button class="al-login-btn" id="al-btn" onclick="submitAdmin()" style="opacity:.4;cursor:not-allowed">Access Console →</button>
+      <div style="font-family:var(--ff-u);font-size:10px;color:rgba(255,255,255,.18);text-align:center;margin-top:13px;line-height:1.65">Access restricted to authorised O MY HELP staff only.</div>
+      <button style="background:none;color:rgba(255,255,255,.2);font-family:var(--ff-u);font-size:10px;text-decoration:underline;margin-top:11px;width:100%" onclick="demoAdmin()">Use demo credentials</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ ADMIN DASHBOARD ═══════ -->
+<div id="page-admin-dashboard" class="page">
+<div class="a-dash">
+  <div class="a-sb" id="a-sb">
+    <div class="a-sb-hdr"><div class="a-sb-lm"><em>OM</em></div><div><div class="a-sb-n">O MY HELP</div><div class="a-sb-s">ADMIN CONSOLE</div></div></div>
+    <nav class="a-nav">
+      <button class="a-ni a" onclick="setATab('dashboard',this)"><span class="a-ni-ic">📊</span><span>Dashboard</span><div class="a-ni-dot"></div></button>
+      <button class="a-ni" onclick="setATab('workers',this)"><span class="a-ni-ic">👥</span><span>Workers</span></button>
+      <button class="a-ni" onclick="setATab('households',this)"><span class="a-ni-ic">🏠</span><span>Households</span></button>
+      <button class="a-ni" onclick="setATab('placements',this)"><span class="a-ni-ic">✅</span><span>Placements</span></button>
+      <button class="a-ni" onclick="setATab('payouts',this)"><span class="a-ni-ic">💰</span><span>Payouts</span></button>
+      <button class="a-ni" onclick="setATab('verification',this)"><span class="a-ni-ic">🔍</span><span>Verification</span></button>
+      <button class="a-ni" onclick="setATab('policedb',this)"><span class="a-ni-ic">👮</span><span>Police DB</span></button>
+      <button class="a-ni" onclick="setATab('camps',this)"><span class="a-ni-ic">🏕️</span><span>Camps</span></button>
+      <button class="a-ni" onclick="setATab('disputes',this)"><span class="a-ni-ic">⚖️</span><span>Disputes</span></button>
+      <button class="a-ni" onclick="setATab('analytics',this)"><span class="a-ni-ic">📈</span><span>Analytics</span></button>
+    </nav>
+    <div class="a-sb-ft">
+      <button class="a-col-btn" id="a-col-btn" onclick="toggleSB()"><span id="a-col-ic">◀</span><span id="a-col-lbl"> Collapse</span></button>
+      <button style="width:100%;padding:6px;border-radius:7px;background:rgba(214,53,80,.09);border:1px solid rgba(214,53,80,.14);color:var(--rose);font-family:var(--ff-u);font-size:10px;margin-top:5px" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="a-main">
+    <div class="a-tb">
+      <div><div class="a-tb-t" id="a-tb-t">📊 Dashboard</div><div class="a-tb-s">O MY HELP · DELHI NCR</div></div>
+      <div style="display:flex;gap:9px;align-items:center">
+        <div class="live-b"><div class="live-dot"></div>LIVE</div>
+        <span style="font-family:var(--ff-u);font-size:11px;color:rgba(255,255,255,.28)" id="a-admin-n">Admin</span>
+        <button style="background:rgba(214,53,80,.09);border:1px solid rgba(214,53,80,.18);border-radius:7px;padding:4px 11px;color:var(--rose);font-family:var(--ff-u);font-size:10px;font-weight:700" onclick="logout()">Logout</button>
+      </div>
+    </div>
+    <div class="a-cnt" id="a-cnt"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ AUTH ═══════ -->
+<div id="page-auth" class="page">
+<div class="auth-wrap2" id="auth-wrap2">
+  <div style="padding:17px 26px;display:flex;align-items:center;gap:11px">
+    <button class="auth-back" onclick="goBack()">← Back</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="auth-lm" style="width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--ff-d);font-size:12px;font-weight:700;color:var(--w);font-style:italic;background:linear-gradient(135deg,var(--p),var(--pd))"><em>OM</em></div>
+      <div><div style="font-family:var(--ff-d);font-size:14px;font-weight:700;color:var(--w)">O MY HELP</div><div style="font-family:var(--ff-u);font-size:7px;letter-spacing:2.5px;color:rgba(255,255,255,.28);margin-top:1px" id="auth-ls">PORTAL</div></div>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:18px 22px">
+    <div class="auth-card2">
+      <div class="auth-tabs2">
+        <button class="auth-tab2 a" id="atab-l" onclick="setAMode('login')">🔑 Login</button>
+        <button class="auth-tab2" id="atab-r" onclick="setAMode('register')">✨ Register</button>
+      </div>
+      <div style="font-family:var(--ff-d);font-size:24px;font-weight:700;color:var(--w);margin-bottom:3px" id="auth-t2">Welcome Back</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.32);margin-bottom:20px;font-weight:300" id="auth-s2">Enter your details to continue</div>
+      <div class="auth-err2" id="auth-err2"></div>
+      <div id="af-nm" class="a-fld" style="display:none"><label class="a-lbl">FULL NAME</label><input class="a-inp2" id="ai-nm" placeholder="Aapka poora naam" oninput="valAuth()"/></div>
+      <div class="a-fld"><label class="a-lbl">MOBILE NUMBER</label><input class="a-inp2" id="ai-ph" type="tel" maxlength="10" placeholder="10-digit mobile" oninput="valAuth()"/><div class="a-hint m" id="ah-ph"></div></div>
+      <div class="a-fld"><label class="a-lbl">4-DIGIT PIN</label><input class="a-inp2 pin" id="ai-pi" type="password" maxlength="4" placeholder="••••" oninput="valAuth()"/></div>
+      <div id="af-pc" class="a-fld" style="display:none"><label class="a-lbl">CONFIRM PIN</label><input class="a-inp2 pin" id="ai-pc" type="password" maxlength="4" placeholder="••••" oninput="valAuth()"/><div class="a-hint m" id="ah-pc"></div></div>
+      <div id="af-rf" class="a-fld" style="display:none"><label class="a-lbl">REFERRAL CODE <span style="font-weight:300;letter-spacing:0;opacity:.6">(Optional)</span></label><input class="a-inp2" id="ai-rf" type="tel" maxlength="10" placeholder="Registered worker ka phone number (ek baar ka ₹50 bonus unhe milega)" oninput="valAuth()"/><div class="a-hint m" id="ah-rf"></div></div>
+      <button class="auth-sub-btn" id="auth-sub" onclick="subAuth()" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.22);cursor:not-allowed">Login →</button>
+      <button class="auth-demo-btn" onclick="demoLogin()">Use demo account</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ WORKER APP ═══════ -->
+<div id="page-worker-app" class="page">
+<div class="wa-pg">
+  <div class="wa-hdr">
+    <div class="wa-ht">
+      <div>
+        <div style="font-family:var(--ff-u);font-size:9px;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,.38);margin-bottom:3px">NAMASTE 👋</div>
+        <div style="font-family:var(--ff-d);font-size:22px;font-weight:700;color:var(--w)" id="wa-n">Sunita Devi</div>
+        <div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap">
+          <span class="pill" id="wa-cp" style="background:rgba(196,144,16,.18);color:var(--goldl)">INFO 3/3</span>
+          <span class="pill" id="wa-rp" style="background:rgba(13,196,158,.1);color:var(--jadel)">Cook</span>
+          <span class="pill" id="wa-veg" style="background:rgba(34,197,94,.12);color:#22C55E;border:1px solid rgba(34,197,94,.25);display:none">🌿 VEG ONLY</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <div class="wa-av" id="wa-av">SD</div>
+        <button style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:3px 8px;color:rgba(255,255,255,.44);font-family:var(--ff-u);font-size:8px;font-weight:600" onclick="logout()">LOGOUT</button>
+      </div>
+    </div>
+    <div class="wa-sg">
+      <div class="wa-ss"><div class="wa-sv">₹100</div><div class="wa-sl">EARNED</div></div>
+      <div class="wa-ss"><div class="wa-sv">3</div><div class="wa-sl">JOB ALERTS</div></div>
+      <div class="wa-ss"><div class="wa-sv" id="wa-score">72</div><div class="wa-sl">SCORE /100</div></div>
+    </div>
+  </div>
+  <div class="wa-body">
+    <!-- Worker Score Card -->
+    <div class="wa-cd">
+      <div class="wa-ct">YOUR WORKER SCORE</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div><div style="font-family:var(--ff-d);font-size:36px;font-weight:700;color:var(--jadel)">72<span style="font-size:18px;color:rgba(255,255,255,.3)">/100</span></div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--jadel);margin-top:2px">🟢 TRUSTED</div></div>
+        <div style="text-align:right;font-size:11px;color:rgba(255,255,255,.3);line-height:1.8">
+          <div>Profile: 10/20</div>
+          <div>Commitment: 20/30</div>
+          <div>Rating: 22/25</div>
+          <div>History: 10/15</div>
+          <div>Response: 10/10</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:8px;height:6px;margin-bottom:8px"><div style="background:linear-gradient(90deg,var(--jadel),var(--jade));height:100%;border-radius:8px;width:72%"></div></div>
+      <div style="font-size:11px;color:rgba(255,255,255,.28);font-weight:300">Complete INFO 2/3 to reach 🟡 Preferred status and unlock higher salary households.</div>
+    </div>
+    <!-- Job Alerts -->
+    <div class="wa-cd">
+      <div class="wa-ct">🔔 NEW JOB ALERTS</div>
+      <div class="wa-alt">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+          <div><div style="font-family:var(--ff-u);font-size:11px;font-weight:700;color:rgba(255,255,255,.72);margin-bottom:3px">Sharma Family · Vasant Kunj</div><div style="font-size:10px;color:rgba(13,196,158,.78);margin-bottom:9px">👨‍🍳 Cook · ₹18,000/mo · Live-in</div></div>
+          <span class="pill" style="background:rgba(214,53,80,.14);color:var(--rose)">URGENT</span>
+        </div>
+        <div style="display:flex;gap:7px"><button style="flex:1;padding:7px;border-radius:8px;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.38);font-family:var(--ff-u);font-size:10px;font-weight:600">❌ Decline</button><button style="flex:2;padding:7px;border-radius:8px;background:linear-gradient(135deg,var(--jade),var(--jaded));color:var(--w);font-family:var(--ff-u);font-size:10px;font-weight:700;box-shadow:0 3px 10px rgba(10,138,114,.28)" onclick="toast('Interest bheja gaya! Household se contact aayega 📞')">✅ Interested</button></div>
+      </div>
+      <div class="wa-alt">
+        <div style="margin-bottom:5px"><div style="font-family:var(--ff-u);font-size:11px;font-weight:700;color:rgba(255,255,255,.72);margin-bottom:3px">Gupta Residence · Greater Kailash</div><div style="font-size:10px;color:rgba(13,196,158,.78)">👨‍🍳 Cook · ₹16,000/mo</div></div>
+        <div style="display:flex;gap:7px;margin-top:9px"><button style="flex:1;padding:7px;border-radius:8px;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.38);font-family:var(--ff-u);font-size:10px;font-weight:600">❌ Decline</button><button style="flex:2;padding:7px;border-radius:8px;background:linear-gradient(135deg,var(--jade),var(--jaded));color:var(--w);font-family:var(--ff-u);font-size:10px;font-weight:700;box-shadow:0 3px 10px rgba(10,138,114,.28)" onclick="toast('Interest bheja gaya! 📞')">✅ Interested</button></div>
+      </div>
+    </div>
+    <!-- Referral -->
+    <div class="wa-cd">
+      <div class="wa-ct">🔗 YOUR REFERRAL CODE</div>
+      <div style="background:rgba(13,196,158,.05);border:1px solid rgba(13,196,158,.11);border-radius:11px;padding:13px;text-align:center;margin-bottom:11px">
+        <div style="font-family:var(--ff-u);font-size:8px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.28);margin-bottom:3px">YOUR PHONE IS YOUR CODE</div><div style="font-size:9px;color:rgba(255,255,255,.22);margin-bottom:5px;font-weight:300">Refer karo · Friend joins · ₹50 directly to your bank</div>
+        <div style="font-family:var(--ff-d);font-size:24px;font-weight:700;color:var(--jadel)" id="wa-rc">9810012345</div>
+      </div>
+      <button style="width:100%;padding:10px;border-radius:11px;background:linear-gradient(135deg,var(--jade),var(--jaded));color:var(--w);font-family:var(--ff-u);font-weight:700;font-size:12px;box-shadow:0 3px 11px rgba(10,138,114,.28)" onclick="toast('Referral link copied! Share karo WhatsApp pe 📤')">Share Referral Link 📤</button>
+    </div>
+  </div>
+  <div class="wa-bnav">
+    <button class="wa-nt" onclick="wTab(this)"><div style="font-size:18px">🏠</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:700;color:var(--jadel);letter-spacing:.5px">Home</div><div style="width:3px;height:3px;border-radius:50%;background:var(--jadel)"></div></button>
+    <button class="wa-nt" onclick="wTab(this)"><div style="font-size:18px">💰</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:500;color:rgba(255,255,255,.28);letter-spacing:.5px">Earnings</div></button>
+    <button class="wa-nt" onclick="wTab(this)"><div style="font-size:18px">✏️</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:500;color:rgba(255,255,255,.28);letter-spacing:.5px">Edit Profile</div></button>
+    <button class="wa-nt" onclick="wTab(this)"><div style="font-size:18px">👤</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:500;color:rgba(255,255,255,.28);letter-spacing:.5px">Profile</div></button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ CUSTOMER APP ═══════ -->
+<div id="page-customer-app" class="page">
+<div class="ca-pg">
+  <div class="ca-hdr">
+    <div class="ca-ht">
+      <div class="ca-lt"><em>O MY HELP</em></div>
+      <div style="display:flex;gap:7px;align-items:center">
+        <div style="background:rgba(232,86,10,.14);border:1px solid rgba(232,86,10,.22);border-radius:20px;padding:3px 10px;font-family:var(--ff-u);font-size:8px;font-weight:700;color:var(--pl);letter-spacing:1px" id="ca-pp">⭐ PREMIUM</div>
+        <button style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:3px 8px;color:rgba(255,255,255,.44);font-family:var(--ff-u);font-size:8px;font-weight:600" onclick="logout()">LOGOUT</button>
+      </div>
+    </div>
+    <div class="ca-si"><div class="ca-sic">🔍</div><input class="ca-sinp" placeholder="Search workers by name or location..."/></div>
+  </div>
+  <div class="ca-body2">
+    <div class="ca-flts">
+      <button class="ca-f a">All</button>
+      <button class="ca-f">🏠 Maid</button>
+      <button class="ca-f">👨‍🍳 Cook</button>
+      <button class="ca-f">🚗 Driver</button>
+      <button class="ca-f">👶 Nanny</button>
+      <button class="ca-f">❤️ Caregiver</button>
+      <button class="ca-f">📋 House Mgr</button>
+    </div>
+    <div id="ca-list"></div>
+  </div>
+  <div class="ca-bnav">
+    <button class="ca-nt"><div style="font-size:18px">🔍</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:700;color:var(--pl);letter-spacing:.5px">Find</div><div style="width:3px;height:3px;border-radius:50%;background:var(--p)"></div></button>
+    <button class="ca-nt"><div style="font-size:18px">☆</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:500;color:rgba(255,255,255,.28);letter-spacing:.5px">Saved</div></button>
+    <button class="ca-nt"><div style="font-size:18px">🏠</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:500;color:rgba(255,255,255,.28);letter-spacing:.5px">Placed</div></button>
+    <button class="ca-nt" onclick="logout()"><div style="font-size:18px">👤</div><div style="font-family:var(--ff-u);font-size:8px;font-weight:500;color:rgba(255,255,255,.28);letter-spacing:.5px">Account</div></button>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// SUPABASE — replace with real values
+// ═══════════════════════════════════════
+const SB_URL = 'https://pfbtnxxsxufyihgesgaq.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmYnRueHhzeHVmeWloZ2VzZ2FxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTA0MDksImV4cCI6MjA5MDc4NjQwOX0.ehpiB0x8Kcn8Tl2uaDyRi-jmT-U1K7yU2UNVZL6uveo';
+let sb = null;
+try {
+  if(SB_URL && SB_URL.includes('supabase.co')){
+    sb = window.supabase.createClient(SB_URL, SB_KEY);
+    console.log('✅ Supabase connected — omyhelp.com is live');
+  } else {
+    console.log('Running in demo mode');
+  }
+} catch(e){ console.log('Demo mode'); }
+
+// ═══════════════════════════════════════
+// MOCK DATABASE
+// ═══════════════════════════════════════
+const DB = {
+  workers:[
+    {phone:'9810012345',name:'Sunita Devi',pin:'1234',role:'Cook',info:2,salaryTier:'basic',stabScore:72,exp:8,plan:null},
+    {phone:'9871234567',name:'Ramesh Kumar',pin:'5678',role:'Driver',info:3,salaryTier:'premium',stabScore:88,exp:12,plan:null},
+    {phone:'9899988877',name:'Meena Sharma',pin:'9999',role:'Maid',info:1,salaryTier:'basic',stabScore:34,exp:6,plan:null}
+  ],
+  customers:[
+    {phone:'9811122334',name:'Rahul Kapoor',pin:'1111',plan:'premium'},
+    {phone:'9899001122',name:'Priya Mehta',pin:'2222',plan:'elite'}
+  ],
+  admins:[{phone:'9818765432',name:'Arcchit (Admin)',pin:'0000'}]
+};
+const ALL_PH = [...DB.workers,...DB.customers,...DB.admins].map(u=>u.phone);
+
+// ═══════════════════════════════════════
+// WORKER DATA
+// ═══════════════════════════════════════
+const WDATA = [
+  {id:1,nm:'Sunita Devi',role:'Cook',loc:'Saket, Delhi',curr:14000,exp:18000,r:4.9,rv:34,aV:true,av:true,ini:'SD',li:true,info:3,salaryTier:'basic',stabScore:87,pvDone:false,yrsExp:8,vegOnly:true},
+  {id:2,nm:'Ramesh Kumar',role:'Driver',loc:'DLF Gurgaon',curr:20000,exp:25000,r:4.8,rv:47,aV:true,av:true,ini:'RK',li:false,info:3,salaryTier:'premium',stabScore:72,pvDone:false,yrsExp:12},
+  {id:3,nm:'Meena Sharma',role:'Maid',loc:'Vasant Kunj',curr:10000,exp:13000,r:4.7,rv:21,aV:true,av:true,ini:'MS',li:true,info:2,salaryTier:'basic',stabScore:45,pvDone:false,yrsExp:6},
+  {id:4,nm:'Abdul Rehman',role:'House Manager',loc:'Golf Course Rd',curr:32000,exp:42000,r:5.0,rv:38,aV:true,av:true,ini:'AR',li:true,info:3,salaryTier:'premium',stabScore:95,pvDone:false,yrsExp:10},
+  {id:5,nm:'Kamla Ben',role:'Elderly Caregiver',loc:'Greater Kailash',curr:22000,exp:26000,r:4.8,rv:22,aV:true,av:true,ini:'KB',li:true,info:3,salaryTier:'elite',stabScore:68,pvDone:false,yrsExp:9},
+  {id:6,nm:'Priya Nair',role:'Nanny',loc:'Defence Colony',curr:16000,exp:20000,r:4.6,rv:14,aV:false,av:false,ini:'PN',li:false,info:1,salaryTier:'basic',stabScore:12,pvDone:false,yrsExp:2}
+];
+
+const RICO = {Maid:'🏠',Cook:'👨‍🍳',Driver:'🚗',Nanny:'👶','Elderly Caregiver':'❤️','House Manager':'📋'};
+
+// INFO DATA
+const INFO_DATA = {
+  1:{label:'INFO 1/3',desc:'Phone + Aadhaar verified',color:'rgba(255,255,255,.55)'},
+  2:{label:'INFO 2/3',desc:'References + employment checked',color:'#E8560A'},
+  3:{label:'INFO 3/3',desc:'Documents + video + O MY HELP reviewed',color:'#0DC49E'}
+};
+
+// SALARY MARKET MEDIANS
+const MARKET_MEDIANS = {Maid:12000,Cook:18000,Driver:22000,Nanny:18000,'Elderly Caregiver':24000,'House Manager':35000};
+
+// SALARY SIGNAL — 20/40% thresholds, red hidden
+function getSalarySignal(role,exp){
+  const med = MARKET_MEDIANS[role]||15000;
+  const ratio = exp/med;
+  if(ratio <= 1.2) return {icon:'🟢',label:'Market rate',color:'#0DC49E',showPrompt:false,isRed:false};
+  if(ratio <= 1.4) return {icon:'🟡',label:'Slightly above market',color:'#F0B830',showPrompt:true,isRed:false};
+  return {icon:'🟡',label:'Above market',color:'#F0B830',showPrompt:true,isRed:true,hidden:true};
+}
+
+// Check if worker salary is above threshold — warn worker
+function checkWorkerSalaryOnSave(role,expectedSalary){
+  const med = MARKET_MEDIANS[role]||15000;
+  const ratio = expectedSalary/med;
+  if(ratio > 1.4){
+    const pctAbove = Math.round((ratio-1)*100);
+    return {
+      warn:true,
+      msg:`Aapki expected salary market rate se ${pctAbove}% zyada hai. Yeh aapki profile ko affect karega aur aapko kam households dikhenge.`,
+      scoreImpact:-5
+    };
+  }
+  return {warn:false};
+}
+
+// SCORE TIERS
+const SCORE_TIERS = [
+  {min:91,max:100,label:'⭐ Star Worker',color:'#C49010'},
+  {min:76,max:90, label:'🟡 Preferred',  color:'#F0B830'},
+  {min:56,max:75, label:'🟢 Trusted',    color:'#0DC49E'},
+  {min:31,max:55, label:'🔵 Rising',     color:'#4A9EFF'},
+  {min:0, max:30, label:'🔘 Standard',   color:'rgba(255,255,255,.4)'}
+];
+function getScoreTier(score){
+  return SCORE_TIERS.find(t=>score>=t.min&&score<=t.max)||SCORE_TIERS[4];
+}
+
+// ═══════════════════════════════════════
+// AVAILABILITY STATES
+// ═══════════════════════════════════════
+const AVAIL_STATES = {
+  available:{label:'🟢 Available',color:'#0DC49E'},
+  placed:   {label:'🔴 Placed',   color:'#D63550'},
+  onLeave:  {label:'🟡 On Leave', color:'#F0B830'}
+};
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let curPage='page-customer-landing',curRole='customer',curUser=null,authMode='login',prevPg='page-customer-landing';
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function gotoPage(id){
+  prevPg=curPage;
+  document.getElementById(curPage).classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  curPage=id; window.scrollTo(0,0);
+  setTimeout(doReveal,80);
+}
+function goBack(){ gotoPage(prevPg); }
+function logout(){ curUser=null; gotoPage('page-customer-landing'); toast('Logged out'); }
+
+// ═══════════════════════════════════════
+// REVEAL ON SCROLL
+// ═══════════════════════════════════════
+function doReveal(){
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')});},{threshold:.08});
+  document.querySelectorAll('.reveal:not(.in)').forEach(el=>obs.observe(el));
+}
+doReveal();
+window.addEventListener('scroll',()=>{
+  document.getElementById('c-nav')?.classList.toggle('sc',window.scrollY>60);
+});
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function toast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+// ═══════════════════════════════════════
+// FAQ
+// ═══════════════════════════════════════
+const FAQS=[
+  {q:'What happens if the worker leaves?',a:'We get 15 days to find you a free replacement at no extra cost. If we cannot place a replacement within 15 days, you receive an automatic pro-rata refund on your placement fee — no paperwork, no calls, no chasing. Month 1: 70% back. Month 2: 60%. Month 3: 50%. Month 4: 40%. Month 5: 20%. Month 6: 10%. After Month 6 no cash refund but we still attempt a replacement.'},
+  {q:'How are workers verified?',a:'Every worker goes through a structured INFO system. INFO 1/3 means phone and Aadhaar OTP verified. INFO 2/3 adds references and employment history checks. INFO 3/3 means documents submitted, video introduction recorded, and O MY HELP has reviewed and approved the full profile. Police verification is a separate service available for purchase by households — it is not part of the INFO levels.'},
+  {q:'What is the placement fee and are there any hidden charges?',a:'The placement fee is a flat 6% of the worker\'s annual salary — identical across all plans. There are no hidden charges, no ongoing commissions, and no deductions from the worker\'s salary. Workers pay nothing to join or find work. You pay once when we successfully place someone and nothing more until you need us again.'},
+  {q:'How quickly will I receive worker profiles?',a:'The moment you subscribe or start your free trial, 2 curated worker profiles matched to your requirement are sent directly to your WhatsApp — instantly. If you decline both, 2 more are sent immediately. You can also browse unlimited profiles on the app at any time.'},
+  {q:'What is the difference between Basic, Premium and Elite?',a:'All three plans include the same 6% flat placement fee and full refund protection. Basic gives access to workers in the ₹8,000–₹20,000 salary range. Premium unlocks workers up to ₹36,000 per month and includes 2 background checks and 1 police verification per year plus full salary benchmark reports. Elite is for households hiring at ₹36,000 and above with 3 background checks and 2 police verifications per year. Introductory prices: Basic ₹999, Premium ₹2,999, Elite ₹7,999.'},
+  {q:'What cities are you currently live in?',a:'O MY HELP is currently live across Delhi NCR — covering Delhi, Gurugram, Noida, Faridabad, Ghaziabad and Greater Noida. Mumbai, Bengaluru and other metros are planned for Phase 2.'},
+  {q:'What if I want to change my worker?',a:'If your worker leaves within 6 months, O MY HELP automatically begins the replacement process. We get 15 days to find a suitable replacement — free of charge. You will receive 2 new matched profiles on WhatsApp within that window. Premium subscribers receive up to 5 replacement profiles, Elite subscribers receive as many as needed. Only if replacement fails does a cash refund trigger.'}
+];
+const fl=document.getElementById('faq-list');
+if(fl) FAQS.forEach(f=>{
+  fl.innerHTML+=`<div class="faq-i"><button class="faq-q-btn" onclick="tFaq(this)"><span class="faq-qt">${f.q}</span><span class="faq-ic">+</span></button><div class="faq-a"><div class="faq-ai">${f.a}</div></div></div>`;
+});
+function tFaq(btn){const i=btn.closest('.faq-i'),was=i.classList.contains('op');document.querySelectorAll('.faq-i.op').forEach(x=>x.classList.remove('op'));if(!was)i.classList.add('op');}
+
+// ═══════════════════════════════════════
+// HOW IT WORKS TOGGLE
+// ═══════════════════════════════════════
+const HOW={
+  hh:[{n:'1',i:'💬',t:'Tell us what you need',d:'WhatsApp or web — role, area, budget. 2 minutes.'},
+      {n:'2',i:'📱',t:'2 profiles on WhatsApp instantly',d:'Curated and matched. No browsing. We do the work.'},
+      {n:'3',i:'🤝',t:'Worker confirms interest',d:'You never chase. Worker confirms — contact shared.'},
+      {n:'4',i:'🛡️',t:'Hire with full protection',d:'Free replacement within 15 days if worker leaves.'}],
+  wk:[{n:'1',i:'📱',t:'Register in 30 seconds',d:'Phone + OTP. Free forever.'},
+      {n:'2',i:'📝',t:'Complete INFO 1/3',d:'24 WhatsApp questions. 8 minutes. Profile goes live.'},
+      {n:'3',i:'🔔',t:'Get matched job alerts',d:'Households near you. Confirm interest — contact shared.'},
+      {n:'4',i:'💰',t:'Get paid reliably',d:'Every Monday. Verified UPI or bank. No cuts.'}]
+};
+function switchHow(m){
+  document.getElementById('hbtn-hh').classList.toggle('a',m==='hh');
+  document.getElementById('hbtn-wk').classList.toggle('a',m==='wk');
+  const cta=document.getElementById('how-cta');
+  document.getElementById('how-steps').innerHTML=HOW[m].map(s=>`<div class="how-s reveal in"><div class="how-num">${s.n}</div><div class="how-ic">${s.i}</div><div class="how-t">${s.t}</div><p class="how-d">${s.d}</p></div>`).join('');
+  cta.textContent=m==='hh'?'Find My Staff →':'Register as Worker — Free →';
+  cta.onclick=()=>showAuth(m==='hh'?'customer':'worker');
+}
+
+// ═══════════════════════════════════════
+// REFERRAL SYSTEM — SINGLE LEVEL ONLY
+// Legally clean — no L2/multi-level structure
+// ═══════════════════════════════════════
+const REFERRAL = {
+  reward: 50,          // ₹50 per referral — single level only
+  trigger: 'info_1_3', // Triggers when referred worker completes INFO 1/3
+  levels: 1,           // Single level — no L2, no chain
+  // Legal note: Single-level referral programs are universally accepted in India.
+  // Multi-level structures attract scrutiny under Prize Chits and Money
+  // Circulation Schemes (Banning) Act 1978. We use single level only.
+};
+
+function calcRef(){
+  const n=parseInt(document.getElementById('ref-c')?.value)||0;
+  const el=document.getElementById('ref-r');
+  if(el)el.textContent='₹'+(n*REFERRAL.reward).toLocaleString();
+}
+function updateCalc(v){
+  const sl=document.getElementById('ref-sl-l');
+  const cd=document.getElementById('ref-cd');
+  if(sl)sl.textContent=v+' dost refer karo';
+  if(cd)cd.textContent='₹'+(v*REFERRAL.reward).toLocaleString();
+}
+
+// Process referral reward — called when referred worker completes INFO 1/3
+async function processReferralReward(referrerPhone, newWorkerPhone){
+  if(!referrerPhone || referrerPhone === newWorkerPhone) return; // no self-referral
+  const reward = REFERRAL.reward;
+  if(sb){
+    try{
+      // Log reward event
+      await sb.from('referral_rewards').insert({
+        referrer_phone: referrerPhone,
+        referred_phone: newWorkerPhone,
+        reward_amount: reward,
+        trigger: REFERRAL.trigger,
+        level: 1, // always 1 — single level only
+        status: 'pending_payout',
+        created_at: new Date().toISOString()
+      });
+      // Add to Monday payout queue
+      await sb.from('payout_queue').insert({
+        worker_phone: referrerPhone,
+        amount: reward,
+        type: 'referral_bonus',
+        scheduled_date: getNextMonday(),
+        status: 'scheduled'
+      });
+      console.log(`Referral reward ₹${reward} queued for ${referrerPhone}`);
+    } catch(e){ console.log('Referral reward error:', e); }
+  }
+}
+
+// Validate referral code on registration
+function validateReferralCode(referrerPhone, newPhone){
+  if(!referrerPhone) return {valid:false, msg:''};
+  if(referrerPhone === newPhone) return {valid:false, msg:'Apna number nahi chalega'};
+  if(referrerPhone.length !== 10) return {valid:false, msg:'10 digits chahiye'};
+  if(!ALL_PH.includes(referrerPhone)) return {valid:false, msg:'Number registered nahi hai'};
+  return {valid:true, msg:'Registered worker mila!'};
+}
+
+// Get next Monday date for payout scheduling
+function getNextMonday(){
+  const d = new Date();
+  const day = d.getDay();
+  const diff = day === 1 ? 7 : (8 - day) % 7;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().split('T')[0];
+}
+
+// ═══════════════════════════════════════
+// AUTH FLOW
+// ═══════════════════════════════════════
+function showAuth(role){
+  curRole=role; prevPg=curPage;
+  const th={
+    worker: {ac:'linear-gradient(135deg,#0A8A72,#076B59)',ls:'WORKER PORTAL',bg:'linear-gradient(160deg,#050803,#0A1208)'},
+    customer:{ac:'linear-gradient(135deg,#E8560A,#B83D00)',ls:'HOUSEHOLD PORTAL',bg:'linear-gradient(160deg,#0F0A05,#1C1108)'},
+    admin:  {ac:'linear-gradient(135deg,#E8560A,#B83D00)',ls:'ADMIN PORTAL',bg:'linear-gradient(160deg,#060A0E,#0A1014)'}
+  };
+  const t=th[role];
+  const aw=document.getElementById('auth-wrap2');
+  if(aw) aw.style.background=t.bg;
+  const alm=document.getElementById('auth-lm');
+  if(alm) alm.style.background=t.ac;
+  const als=document.getElementById('auth-ls');
+  if(als) als.textContent=t.ls;
+  setAMode('login'); gotoPage('page-auth');
+}
+function setAMode(mode){
+  authMode=mode; const isR=mode==='register';
+  document.getElementById('atab-l').classList.toggle('a',mode==='login');
+  document.getElementById('atab-r').classList.toggle('a',isR);
+  document.getElementById('af-nm').style.display=isR?'block':'none';
+  document.getElementById('af-pc').style.display=isR?'block':'none';
+  const afrf=document.getElementById('af-rf');
+  if(afrf) afrf.style.display=(isR&&curRole==='worker')?'block':'none';
+  document.getElementById('auth-t2').textContent=isR?'Create Account':'Welcome Back';
+  document.getElementById('auth-s2').textContent=isR?`Join as ${curRole}`:`${curRole.charAt(0).toUpperCase()+curRole.slice(1)} portal`;
+  document.getElementById('auth-sub').textContent=isR?'Create Account →':'Login →';
+  ['ai-nm','ai-ph','ai-pi','ai-pc','ai-rf'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('auth-err2').style.display='none';
+  valAuth();
+}
+function valAuth(){
+  const ph=(document.getElementById('ai-ph')?.value||'').replace(/\D/g,'');
+  const pi=document.getElementById('ai-pi')?.value||'';
+  const pc=document.getElementById('ai-pc')?.value||'';
+  const nm=document.getElementById('ai-nm')?.value.trim()||'';
+  const rf=(document.getElementById('ai-rf')?.value||'').replace(/\D/g,'');
+  const php=document.getElementById('ah-ph');
+  if(php){
+    if(ph.length>0&&ph.length!==10){php.textContent='10 digits chahiye';php.className='a-hint e';}
+    else if(ph.length===10){php.textContent='✓';php.className='a-hint o';}
+    else php.textContent='';
+  }
+  if(authMode==='register'){
+    const pcp=document.getElementById('ah-pc');
+    if(pcp){if(pc.length===4){if(pi===pc){pcp.textContent='✓ Match';pcp.className='a-hint o';}else{pcp.textContent='PINs match nahi';pcp.className='a-hint e';}}else pcp.textContent='';}
+    const rfp=document.getElementById('ah-rf');
+    if(rfp&&rf.length>0){
+      if(rf===ph){rfp.textContent='Apna number nahi';rfp.className='a-hint e';}
+      else if(rf.length!==10){rfp.textContent='10 digits chahiye';rfp.className='a-hint e';}
+      else if(!ALL_PH.includes(rf)){rfp.textContent='Number registered nahi';rfp.className='a-hint e';}
+      else{rfp.textContent='Registered worker mila!';rfp.className='a-hint o';}
+    }else if(rfp) rfp.textContent='';
+  }
+  const rfOk=rf.length===0||(rf.length===10&&rf!==ph&&ALL_PH.includes(rf));
+  const pmOk=authMode==='login'||pi===pc;
+  const nmOk=authMode==='login'||nm.length>0;
+  const ok=ph.length===10&&pi.length===4&&pmOk&&nmOk&&rfOk;
+  const btn=document.getElementById('auth-sub');
+  const ac=curRole==='worker'?'linear-gradient(135deg,#0A8A72,#076B59)':'linear-gradient(135deg,#E8560A,#B83D00)';
+  btn.style.background=ok?ac:'rgba(255,255,255,.06)';
+  btn.style.color=ok?'#fff':'rgba(255,255,255,.22)';
+  btn.style.cursor=ok?'pointer':'not-allowed';
+  btn.style.boxShadow=ok?(curRole==='worker'?'0 4px 16px rgba(10,138,114,.38)':'0 4px 16px rgba(232,86,10,.38)'):'none';
+}
+async function subAuth(){
+  const ph=(document.getElementById('ai-ph')?.value||'').replace(/\D/g,'');
+  const pi=document.getElementById('ai-pi')?.value||'';
+  const nm=document.getElementById('ai-nm')?.value.trim()||'';
+  const ee=document.getElementById('auth-err2');
+  ee.style.display='none';
+  if(sb){
+    try{
+      if(authMode==='login'){
+        const{data,error}=await sb.from('users').select('*').eq('phone',ph).eq('pin',pi).single();
+        if(data&&!error){enterApp(data.role_type||curRole,data);return;}
+      }
+    }catch(e){}
+  }
+  if(authMode==='login'){
+    const pool=DB[curRole+'s']||[];
+    const u=pool.find(u=>u.phone===ph&&u.pin===pi);
+    if(u){enterApp(curRole,u);}
+    else{const demo=pool[0];ee.textContent='Galat credentials. Demo: '+(demo?.phone||'')+' / PIN: '+(demo?.pin||'');ee.style.display='block';}
+  } else {
+    if(ALL_PH.includes(ph)){ee.textContent='Number already registered. Please login.';ee.style.display='block';return;}
+    enterApp(curRole,{phone:ph,name:nm||ph,pin:pi,role:null,info:0,plan:'trial'});
+  }
+}
+function demoLogin(){enterApp(curRole,(DB[curRole+'s']||DB.workers)[0]);}
+
+// ═══════════════════════════════════════
+// ENTER APP
+// ═══════════════════════════════════════
+function enterApp(role,user){
+  if(!user)return;
+  curUser={...user,role_type:role};
+  const ini=(user.name||'OM').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  if(role==='worker'){
+    const infoLvl=user.info||1;
+    const infoLabel=INFO_DATA[infoLvl]?.label||'INFO 1/3';
+    const infoColor=INFO_DATA[infoLvl]?.color||'rgba(255,255,255,.4)';
+    const wn=document.getElementById('wa-n');if(wn)wn.textContent=user.name||'Welcome!';
+    const wav=document.getElementById('wa-av');if(wav)wav.textContent=ini;
+    const wrc=document.getElementById('wa-rc');if(wrc)wrc.textContent=user.phone;
+    const wsc=document.getElementById('wa-score');if(wsc)wsc.textContent=user.stabScore||'--';
+    const cp=document.getElementById('wa-cp');
+    if(cp){cp.textContent=infoLabel;cp.style.background=infoColor+'22';cp.style.color=infoColor;}
+    const rp=document.getElementById('wa-rp');if(rp)rp.textContent=user.role||'Set Role';
+    const vegTag=document.getElementById('wa-veg');
+    if(vegTag){vegTag.style.display=(user.role==='Cook'&&user.vegOnly)?'inline-flex':'none';}
+    gotoPage('page-worker-app');
+    toast('Welcome, '+(user.name?.split(' ')[0]||'')+'! 👋');
+  } else if(role==='customer'){
+    const pp=user.plan==='elite'?'💎 ELITE':user.plan==='premium'?'⭐ PREMIUM':'✓ BASIC';
+    const capp=document.getElementById('ca-pp');if(capp)capp.textContent=pp;
+    buildWorkerList();
+    gotoPage('page-customer-app');
+    toast('Welcome, '+(user.name?.split(' ')[0]||'')+'! Find your staff →');
+  } else if(role==='admin'){
+    const an=document.getElementById('a-admin-n');if(an)an.textContent=user.name||'Admin';
+    renderDash(); gotoPage('page-admin-dashboard');
+    toast('Dashboard loaded');
+  }
+}
+
+// ═══════════════════════════════════════
+// ADMIN LOGIN
+// ═══════════════════════════════════════
+let aRole='admin';
+function setARole(r){
+  aRole=r;
+  ['admin','manager','support'].forEach(x=>document.getElementById('alr-'+x)?.classList.toggle('a',x===r));
+  updateABtn();
+}
+function updateABtn(){
+  const ok=(document.getElementById('al-ph')?.value||'').replace(/\D/g,'').length===10&&(document.getElementById('al-pin')?.value||'').length===4;
+  const btn=document.getElementById('al-btn');
+  if(btn){btn.style.opacity=ok?'1':'.4';btn.style.cursor=ok?'pointer':'not-allowed';}
+}
+function submitAdmin(){
+  const ph=(document.getElementById('al-ph')?.value||'').replace(/\D/g,'');
+  const pi=document.getElementById('al-pin')?.value||'';
+  const u=DB.admins.find(u=>u.phone===ph&&u.pin===pi);
+  const ee=document.getElementById('al-err');
+  if(u){enterApp('admin',u);}
+  else{if(ee){ee.textContent='Invalid credentials. Demo: 9818765432 / 0000';ee.style.display='block';}}
+}
+function demoAdmin(){enterApp('admin',DB.admins[0]);}
+
+// ═══════════════════════════════════════
+// ADMIN DASHBOARD
+// ═══════════════════════════════════════
+function toggleSB(){
+  const sb2=document.getElementById('a-sb');
+  const collapsed=sb2.style.width==='46px';
+  sb2.style.width=collapsed?'210px':'46px';
+  const ic=document.getElementById('a-col-ic');if(ic)ic.textContent=collapsed?'◀':'▶';
+  const lb=document.getElementById('a-col-lbl');if(lb)lb.textContent=collapsed?' Collapse':'';
+}
+const ATABS={dashboard:'📊 Dashboard',workers:'👥 Workers',households:'🏠 Households',placements:'✅ Placements',payouts:'💰 Payouts',verification:'🔍 Verification',policedb:'👮 Police DB',camps:'🏕️ Camps',disputes:'⚖️ Disputes',analytics:'📈 Analytics'};
+function setATab(tab,btn){
+  document.querySelectorAll('.a-ni').forEach(b=>b.classList.remove('a'));
+  btn.classList.add('a');
+  const t=document.getElementById('a-tb-t');if(t)t.textContent=ATABS[tab]||tab;
+  if(tab==='dashboard')renderDash();
+  else{
+    const cnt=document.getElementById('a-cnt');
+    if(cnt)cnt.innerHTML=`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:15px;padding:44px;text-align:center;margin-top:18px"><div style="font-size:38px;margin-bottom:14px">${ATABS[tab]?.split(' ')[0]}</div><div style="font-family:var(--ff-d);font-size:20px;font-weight:700;color:var(--w);margin-bottom:7px">${ATABS[tab]?.split(' ').slice(1).join(' ')}</div><div style="font-size:12px;color:rgba(255,255,255,.28)">Full module — connects to Supabase when configured</div></div>`;
+  }
+}
+function renderDash(){
+  const cnt=document.getElementById('a-cnt');
+  if(!cnt)return;
+  cnt.innerHTML=`
+  <div class="a-alert">
+    <span style="font-family:var(--ff-u);font-size:10px;font-weight:800;color:var(--rose)">⚠️ ACTION NEEDED</span>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:11px;color:rgba(255,255,255,.55)">3 INFO 3/3 reviews overdue</span><button style="padding:2px 9px;border-radius:6px;background:rgba(214,53,80,.14);border:1px solid rgba(214,53,80,.28);color:var(--rose);font-family:var(--ff-u);font-size:9px;font-weight:700" onclick="toast('Opening review queue...')">Review</button></div>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:11px;color:rgba(255,255,255,.55)">₹67,400 Monday payout pending</span><button style="padding:2px 9px;border-radius:6px;background:rgba(10,138,114,.14);border:1px solid rgba(10,138,114,.28);color:var(--jadel);font-family:var(--ff-u);font-size:9px;font-weight:700" onclick="toast('Payout approved — Razorpay processing 💰')">Approve</button></div>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:11px;color:rgba(255,255,255,.55)">Driver shortage in Gurugram</span><button style="padding:2px 9px;border-radius:6px;background:rgba(232,86,10,.14);border:1px solid rgba(232,86,10,.28);color:var(--pl);font-family:var(--ff-u);font-size:9px;font-weight:700" onclick="toast('Camp scheduled for Saturday 🏕️')">Schedule Camp</button></div>
+  </div>
+  <div class="a-kpig">
+    <div class="a-kpi"><div class="a-kpi-ic">👥</div><div class="a-kpi-v" style="color:var(--jadel)">12,483</div><div class="a-kpi-l">TOTAL WORKERS</div><div class="a-kpi-tr" style="color:var(--jadel)">↑ +234 this week</div></div>
+    <div class="a-kpi"><div class="a-kpi-ic">🏠</div><div class="a-kpi-v" style="color:var(--pl)">3,847</div><div class="a-kpi-l">HOUSEHOLDS</div><div class="a-kpi-tr" style="color:var(--pl)">↑ +89 this week</div></div>
+    <div class="a-kpi"><div class="a-kpi-ic">✅</div><div class="a-kpi-v" style="color:var(--goldl)">1,204</div><div class="a-kpi-l">PLACEMENTS</div><div class="a-kpi-tr" style="color:var(--goldl)">↑ +67 this month</div></div>
+    <div class="a-kpi"><div class="a-kpi-ic">💰</div><div class="a-kpi-v" style="color:var(--rose)">₹24.6L</div><div class="a-kpi-l">REVENUE MTD</div><div class="a-kpi-tr" style="color:var(--rose)">↑ +₹3.2L</div></div>
+    <div class="a-kpi"><div class="a-kpi-ic">📤</div><div class="a-kpi-v" style="color:#4A9EFF">₹67,400</div><div class="a-kpi-l">MONDAY PAYOUT</div><div class="a-kpi-tr" style="color:var(--goldl)">⚠ Pending</div></div>
+    <div class="a-kpi"><div class="a-kpi-ic">⚖️</div><div class="a-kpi-v" style="color:rgba(255,255,255,.4)">3</div><div class="a-kpi-l">OPEN DISPUTES</div><div class="a-kpi-tr" style="color:rgba(255,255,255,.3)">Stable</div></div>
+  </div>
+  <div class="a-cg">
+    <div class="a-cc"><div class="a-cc-t">Worker Funnel</div>
+      ${[['Step 1 Registered',12483,100,'rgba(255,255,255,.28)'],['INFO 1/3',8621,69,'#0DC49E'],['INFO 2/3',3124,25,'#E8560A'],['INFO 3/3',987,8,'#C49010']].map(([l,n,p,c])=>`
+      <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--ff-u);font-size:10px;color:rgba(255,255,255,.32)">${l}</span><span style="font-family:var(--ff-d);font-size:12px;font-weight:700;color:${c}">${n.toLocaleString()}</span></div><div class="a-bar-bg"><div class="a-bar-f" style="width:${p}%;background:${c}"></div></div></div>`).join('')}
+    </div>
+    <div class="a-cc"><div class="a-cc-t">Revenue This Month</div>
+      ${[['Subscriptions','₹2,85,072','var(--jadel)'],['Placement Fees','₹3,23,600','var(--pl)'],['BG Checks','₹34,500','var(--goldl)'],['Police Verif','₹18,000','var(--goldl)'],['Auto-debits','₹12,400','rgba(255,255,255,.4)']].map(([l,v,c])=>`
+      <div class="a-row"><span class="a-rl">${l}</span><span class="a-rv" style="color:${c}">${v}</span></div>`).join('')}
+      <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:8px;padding-top:10px;display:flex;justify-content:space-between"><span style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--w)">Total MTD</span><span style="font-family:var(--ff-d);font-size:18px;font-weight:700;color:var(--p)">₹6,73,572</span></div>
+    </div>
+    <div class="a-cc"><div class="a-cc-t">Supply vs Demand</div>
+      ${[['Maid',847,234,'ok'],['Cook',423,312,'ok'],['Driver',89,187,'short'],['Nanny',234,156,'ok'],['Caregiver',67,89,'tight'],['House Mgr',34,23,'ok']].map(([r,a,n,s])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="font-family:var(--ff-u);font-size:10px;color:rgba(255,255,255,.32)">${r}</span><div style="display:flex;gap:6px;align-items:center"><span style="font-family:var(--ff-u);font-size:9px;color:rgba(255,255,255,.28)">${a}/${n}</span><span class="pill" style="background:${s==='short'?'rgba(214,53,80,.14)':s==='tight'?'rgba(196,144,16,.14)':'rgba(10,138,114,.14)'};color:${s==='short'?'#D63550':s==='tight'?'#C49010':'#0DC49E'};font-size:7px">${s==='short'?'SHORT':s==='tight'?'TIGHT':'OK'}</span></div></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// CUSTOMER APP WORKER LIST
+// ═══════════════════════════════════════
+function buildWorkerList(){
+  const list=document.getElementById('ca-list');
+  if(!list)return;
+  const isPremium=curUser&&(curUser.plan==='premium'||curUser.plan==='elite'||curUser.plan==='trial');
+  const isElite=curUser&&curUser.plan==='elite';
+  list.innerHTML=WDATA.map(w=>{
+    if(w.salaryTier==='elite'&&!isElite) return '';
+    if(w.salaryTier==='premium'&&!isPremium) return '';
+    const lvl=INFO_DATA[w.info]||INFO_DATA[1];
+    const sig=getSalarySignal(w.role,w.exp);
+    const tier=getScoreTier(w.stabScore);
+    const stars='★'.repeat(Math.floor(w.r))+'☆'.repeat(5-Math.floor(w.r));
+    return `<div class="ca-wc">
+      <div class="ca-wt">
+        <div class="ca-wav">${w.ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><div class="ca-wname">${w.nm}</div><div class="ca-wrole">${RICO[w.role]||''} ${w.role.toUpperCase()} · ${w.loc.toUpperCase()}</div></div>
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end">
+              <span class="pill" style="background:${lvl.color}22;color:${lvl.color};font-size:7px">${lvl.label}</span>
+              <span class="pill" style="background:${w.av?'rgba(13,196,158,.11)':'rgba(214,53,80,.11)'};color:${w.av?'#0DC49E':'#D63550'};font-size:7px">${w.av?'AVAILABLE':'BUSY'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--goldl);letter-spacing:2px;margin-bottom:7px">${stars} <span style="color:rgba(255,255,255,.22);font-size:9px">${w.r} (${w.rv}) · ${w.yrsExp} yrs exp</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+        <span class="pill" style="background:rgba(13,196,158,.09);color:#0DC49E;font-size:7px">✓ Aadhaar</span>
+        ${w.li?'<span class="pill" style="background:rgba(232,86,10,.09);color:var(--pl);font-size:7px">Live-in</span>':''}
+        ${w.role==='Cook'&&w.vegOnly?'<span class="pill" style="background:rgba(34,197,94,.12);color:#22C55E;border:1px solid rgba(34,197,94,.25);font-size:7px">🌿 VEG ONLY</span>':''}
+      </div>
+      <div class="ca-wsal">
+        <div><div class="ca-wsl">EXPECTED</div><div class="ca-wsv" style="color:var(--jadel)">₹${w.exp.toLocaleString()}/mo</div></div>
+        <div style="text-align:right">
+          <div class="ca-wsl">SALARY SIGNAL</div>
+          <div style="font-size:13px;font-weight:700;color:${sig.color}">${sig.icon} ${sig.label}</div>
+          ${sig.showPrompt&&!isPremium?'<div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:2px">🔒 Full report → Upgrade</div>':''}
+        </div>
+      </div>
+      ${isPremium?`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:8px 11px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span style="font-family:var(--ff-u);font-size:9px;color:rgba(255,255,255,.35)">WORKER SCORE</span><span style="font-family:var(--ff-d);font-size:13px;font-weight:700;color:${tier.color}">${w.stabScore}/100 · ${tier.label}</span></div>`:''}
+      <div class="ca-wbtns">
+        <button class="ca-bsv" onclick="toast('${w.nm} saved! ☆')">☆ Save</button>
+        <button class="ca-breq" ${!w.av?'disabled style="opacity:.4;cursor:not-allowed"':''} onclick="toast('Interview request sent to ${w.nm}! They will confirm within 24hrs 📞')">${w.av?'Request Interview →':'Unavailable'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// WORKER APP TAB
+// ═══════════════════════════════════════
+function wTab(btn){
+  document.querySelectorAll('.wa-nt div:nth-child(2)').forEach(l=>{l.style.color='rgba(255,255,255,.28)';});
+  document.querySelectorAll('.wa-nt div:nth-child(3)').forEach(d=>{d.style.background='transparent';});
+  const lbl=btn.querySelector('div:nth-child(2)');
+  const dot=btn.querySelector('div:nth-child(3)');
+  if(lbl)lbl.style.color='var(--jadel)';
+  if(dot)dot.style.background='var(--jadel)';
+  toast(lbl?.textContent||'');
+}
+
+// ═══════════════════════════════════════
+// CUSTOMER APP FILTERS
+// ═══════════════════════════════════════
+document.querySelectorAll('.ca-f').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.ca-f').forEach(b=>b.classList.remove('a'));
+    btn.classList.add('a');
+    toast('Filtering: '+btn.textContent.trim());
+  });
+});
+
+// ═══════════════════════════════════════
+// COUNTDOWN TIMER — 48 hours
+// ═══════════════════════════════════════
+(function(){
+  const DURATION=48*60*60*1000;
+  let endTime;
+  try{
+    const stored=localStorage.getItem('omh_launch_end');
+    endTime=stored?parseInt(stored):Date.now()+DURATION;
+    localStorage.setItem('omh_launch_end',endTime);
+  }catch(e){endTime=Date.now()+DURATION;}
+  function tick(){
+    const el=document.getElementById('countdown-timer');
+    if(!el)return;
+    const rem=Math.max(0,Math.floor((endTime-Date.now())/1000));
+    if(rem===0){el.textContent='OFFER EXPIRED';return;}
+    const h=Math.floor(rem/3600),m=Math.floor((rem%3600)/60),s=rem%60;
+    el.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+  tick();setInterval(tick,1000);
+})();
+
+// ═══════════════════════════════════════
+// LIVE STATS + SALARY RANGES FROM SUPABASE
+// ═══════════════════════════════════════
+async function loadLiveData(){
+  if(!sb)return;
+  try{
+    const{count:wc}=await sb.from('users').select('*',{count:'exact',head:true}).eq('role_type','worker');
+    const{count:hc}=await sb.from('users').select('*',{count:'exact',head:true}).eq('role_type','customer');
+    const we=document.getElementById('stat-workers');
+    const he=document.getElementById('stat-households');
+    if(wc&&we)we.textContent=(wc).toLocaleString()+'+';
+    if(hc&&he)he.textContent=(hc).toLocaleString()+'+';
+    // Live salary ranges
+    const{data}=await sb.from('workers').select('role,expected_salary').eq('status','active');
+    if(data&&data.length>0){
+      const grouped={};
+      data.forEach(w=>{if(!grouped[w.role])grouped[w.role]=[];grouped[w.role].push(w.expected_salary);});
+      const ids={Maid:'sal-maid',Cook:'sal-cook',Driver:'sal-driver',Nanny:'sal-nanny','Elderly Caregiver':'sal-caregiver','House Manager':'sal-manager'};
+      Object.keys(grouped).forEach(role=>{
+        const sals=grouped[role];
+        const mn=Math.round(Math.min(...sals)/1000)*1000;
+        const mx=Math.round(Math.max(...sals)/1000)*1000;
+        const el=document.getElementById(ids[role]);
+        if(el)el.textContent='₹'+mn.toLocaleString('en-IN')+'–₹'+mx.toLocaleString('en-IN')+'/mo';
+      });
+    }
+  }catch(e){console.log('Using defaults');}
+}
+loadLiveData();
+
+// ═══════════════════════════════════════
+// LOGO EASTER EGG → ADMIN (5x click)
+// ═══════════════════════════════════════
+let lc=0,lt=0;
+document.getElementById('logo-click')?.addEventListener('click',()=>{
+  const n=Date.now();lc=n-lt<600?lc+1:1;lt=n;
+  if(lc>=5){lc=0;gotoPage('page-admin-landing');toast('Admin access');}
+});
+
+// ═══════════════════════════════════════
+// WORKER COMMITMENT SYSTEM — Backend Logic
+// ═══════════════════════════════════════
+const SCORE_IMPACTS={
+  declaresIntendedStay:+5,completesFullDeclaredStay:+15,
+  notifiesBeforeHoliday:+3,returnsAsDeclared:+3,
+  earlyLeaveWithReason:-10,earlyLeaveNoReason:-20,
+  noReturnAfterHoliday:-15,completesEachMonth:+2,
+  highSalaryWarningIgnored:-5,adjustedSalaryAfterWarning:+3
+};
+// ═══════════════════════════════════════════════════════
+// COOK — VEG ONLY QUESTION (Step 2 WhatsApp bot)
+// ═══════════════════════════════════════════════════════
+// Question sent via Wati.io during INFO 1/3 onboarding
+// Only triggered when worker role = Cook
+const COOK_VEG_QUESTION = {
+  question: 'Kya aap non-veg khana bana sakte/sakti hain?',
+  options: [
+    {id:1, text:'Haan, bana sakta/sakti hoon', action: 'no_tag'},
+    {id:2, text:'Nahi, main sirf veg khana banata/banati hoon', action: 'set_veg_only'}
+  ]
+};
+
+async function processCookVegAnswer(workerId, answer){
+  // answer: 1 = can cook non-veg, 2 = veg only
+  const vegOnly = answer === 2;
+  if(sb){
+    try{
+      await sb.from('workers').update({veg_only: vegOnly}).eq('id', workerId);
+      console.log(`Cook ${workerId} veg_only set to ${vegOnly}`);
+    } catch(e){ console.log('Veg only update error:', e); }
+  } else {
+    // Mock update
+    const w = WDATA.find(w => w.id === workerId);
+    if(w && w.role === 'Cook') w.vegOnly = vegOnly;
+  }
+  if(vegOnly) toast('Profile updated — 🌿 VEG ONLY tag added');
+}
+
+// Worker can update this from their profile edit screen
+async function updateCookVegPreference(workerId, vegOnly){
+  await processCookVegAnswer(workerId, vegOnly ? 2 : 1);
+}
+
+// Worker commitment warning messages (sent via WhatsApp in production)
+const COMMITMENT_MSGS = {
+  earlyDepartureWarning: (nm,hh,declared,actual) => `${nm} ji, aapne ${hh} ke saath ${declared} mahine kaam karne ka commitment kiya tha. Abhi sirf ${actual} mahine hue hain. Early leaving aapki profile score ko affect karega. Kya aap ruk sakte hain? Agar koi problem hai toh O MY HELP team se baat karo — hum help karenge.`,
+  holidayReturn: 'Aapki wapsi ki expected date aa gayi hai. Kya aap wapas aa gaye hain?',
+  stayCompleted: 'Congratulations! Aapne apna poora commitment poora kiya. Aapka score boost ho gaya hai!'
+};
+
+async function applyScoreImpact(workerId,event,reason=''){
+  const impact=SCORE_IMPACTS[event]||0;
+  if(!impact)return;
+  if(sb){
+    try{
+      await sb.from('worker_score_events').insert({worker_id:workerId,event,impact,reason,timestamp:new Date().toISOString()});
+      const{data:w}=await sb.from('workers').select('commit_score').eq('id',workerId).single();
+      if(w){
+        const newScore=Math.min(30,Math.max(0,(w.commit_score||0)+impact));
+        await sb.from('workers').update({commit_score:newScore}).eq('id',workerId);
+      }
+    }catch(e){}
+  }
+}
+
+// ═══════════════════════════════════════
+// WORKER PROFILE EDITING
+// ═══════════════════════════════════════
+const EDITABLE_FIELDS=['name','role','expected_salary','location','languages','skills','employment_history','availability','profile_photo','video_intro'];
+const LOCKED_FIELDS=['phone','aadhaar_number','police_verification_status'];
+const REVIEW_REQUIRED_FIELDS=['employment_history','references','skills'];
+async function updateWorkerProfile(workerId,field,newValue){
+  if(LOCKED_FIELDS.includes(field)){toast('Yeh field verify ho chuki hai 🔒');return false;}
+  if(field==='expected_salary'){
+    const worker=WDATA.find(w=>w.id===workerId);
+    if(worker){const check=checkWorkerSalaryOnSave(worker.role,newValue);if(check.warn){toast('⚠️ '+check.msg.substring(0,80));await applyScoreImpact(workerId,'highSalaryWarningIgnored');}}
+  }
+  const needsReview=REVIEW_REQUIRED_FIELDS.includes(field);
+  if(sb){
+    try{
+      const upd={[field]:newValue,updated_at:new Date().toISOString()};
+      if(needsReview)upd[field+'_pending_review']=true;
+      await sb.from('workers').update(upd).eq('id',workerId);
+      toast(needsReview?'Updated — under review by O MY HELP ✓':'Profile updated ✓');
+    }catch(e){toast('Update failed — please try again');return false;}
+  } else {
+    const w=WDATA.find(w=>w.id===workerId);if(w)w[field]=newValue;
+    toast(needsReview?'Updated — under review ✓':'Profile updated ✓');
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════
+// EXPERIENCE AUTO-INCREMENT (runs via Supabase pg_cron daily)
+// SQL: UPDATE workers SET experience_years = experience_years + 1
+//      WHERE status = 'active' AND DATE(anniversary_date) = CURRENT_DATE
+// ═══════════════════════════════════════
+async function checkExperienceIncrement(workerId){
+  if(!sb)return;
+  try{
+    const{data:w}=await sb.from('workers').select('experience_years,anniversary_date').eq('id',workerId).single();
+    if(!w)return;
+    const today=new Date().toDateString();
+    const ann=new Date(w.anniversary_date).toDateString();
+    if(today===ann){
+      await sb.from('workers').update({
+        experience_years:(w.experience_years||0)+1,
+        anniversary_date:new Date(new Date(w.anniversary_date).setFullYear(new Date().getFullYear()+1)).toISOString()
+      }).eq('id',workerId);
+      toast('Aapka ek saal poora hua! Experience auto-updated 🎉');
+    }
+  }catch(e){}
+}
+</script>
+</body>
+</html>
