@@ -911,7 +911,7 @@ section{padding:60px 20px}
     <div class="wa-sg">
       <div class="wa-ss"><div class="wa-sv">₹100</div><div class="wa-sl">EARNED</div></div>
       <div class="wa-ss"><div class="wa-sv">3</div><div class="wa-sl">JOB ALERTS</div></div>
-      <div class="wa-ss"><div class="wa-sv" id="wa-score">72</div><div class="wa-sl">SCORE /100</div></div>
+      <div class="wa-ss"><div class="wa-sv" id="wa-score">--</div><div class="wa-sl">SCORE /100</div></div>
     </div>
   </div>
   <div class="wa-body">
@@ -919,7 +919,7 @@ section{padding:60px 20px}
     <div class="wa-cd">
       <div class="wa-ct">YOUR WORKER SCORE</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div><div style="font-family:var(--ff-d);font-size:36px;font-weight:700;color:var(--jadel)">72<span style="font-size:18px;color:rgba(255,255,255,.3)">/100</span></div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--jadel);margin-top:2px">🟢 TRUSTED</div></div>
+        <div><div style="font-family:var(--ff-d);font-size:36px;font-weight:700;color:var(--jadel)" id="wa-score-big">--<span style="font-size:18px;color:rgba(255,255,255,.3)">/100</span></div><div style="font-family:var(--ff-u);font-size:10px;font-weight:700;color:var(--jadel);margin-top:2px" id="wa-score-tier">🔵 RISING</div></div>
         <div style="text-align:right;font-size:11px;color:rgba(255,255,255,.3);line-height:1.8">
           <div>Profile: 10/20</div>
           <div>Commitment: 20/30</div>
@@ -928,7 +928,7 @@ section{padding:60px 20px}
           <div>Response: 10/10</div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,.04);border-radius:8px;height:6px;margin-bottom:8px"><div style="background:linear-gradient(90deg,var(--jadel),var(--jade));height:100%;border-radius:8px;width:72%"></div></div>
+      <div style="background:rgba(255,255,255,.04);border-radius:8px;height:6px;margin-bottom:8px"><div style="background:linear-gradient(90deg,var(--jadel),var(--jade));height:100%;border-radius:8px;width:0%" id="wa-score-bar"></div></div>
       <div style="font-size:11px;color:rgba(255,255,255,.28);font-weight:300">Complete INFO 2/3 to reach 🟡 Preferred status and unlock higher salary households.</div>
     </div>
     <!-- Job Alerts -->
@@ -976,7 +976,7 @@ section{padding:60px 20px}
         <button style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:3px 8px;color:rgba(255,255,255,.44);font-family:var(--ff-u);font-size:8px;font-weight:600" onclick="logout()">LOGOUT</button>
       </div>
     </div>
-    <div class="ca-si"><div class="ca-sic">🔍</div><input class="ca-sinp" placeholder="Search workers by name or location..."/></div>
+    <div class="ca-si"><div class="ca-sic">🔍</div><input class="ca-sinp" id="ca-search" placeholder="Search workers by name or location..." oninput="searchWorkers(this.value)"/></div>
   </div>
   <div class="ca-body2">
     <div class="ca-flts">
@@ -1417,7 +1417,12 @@ function enterApp(role,user){
     const wn=document.getElementById('wa-n');if(wn)wn.textContent=user.name||'Welcome!';
     const wav=document.getElementById('wa-av');if(wav)wav.textContent=ini;
     const wrc=document.getElementById('wa-rc');if(wrc)wrc.textContent=user.phone;
-    const wsc=document.getElementById('wa-score');if(wsc)wsc.textContent=user.stabScore||'--';
+    const scoreVal = user.stabScore || user.score_total || 0;
+    const scoreTier = getScoreTier(scoreVal);
+    const wsc=document.getElementById('wa-score');if(wsc)wsc.textContent=scoreVal||'--';
+    const wscb=document.getElementById('wa-score-big');if(wscb)wscb.innerHTML=(scoreVal||'--')+'<span style="font-size:18px;color:rgba(255,255,255,.3)">/100</span>';
+    const wsct=document.getElementById('wa-score-tier');if(wsct){wsct.textContent=scoreVal?scoreTier.label:'Complete profile to build score';wsct.style.color=scoreVal?scoreTier.color:'rgba(255,255,255,.38)';}
+    const wscbar=document.getElementById('wa-score-bar');if(wscbar)wscbar.style.width=(scoreVal||0)+'%';
     const cp=document.getElementById('wa-cp');
     if(cp){cp.textContent=infoLabel;cp.style.background=infoColor+'22';cp.style.color=infoColor;}
     const rp=document.getElementById('wa-rp');if(rp)rp.textContent=user.role||'Set Role';
@@ -1521,12 +1526,13 @@ function renderDash(){
 // ═══════════════════════════════════════
 // CUSTOMER APP WORKER LIST
 // ═══════════════════════════════════════
-function buildWorkerList(){
+function buildWorkerList(filterRole=null){
   const list=document.getElementById('ca-list');
   if(!list)return;
   const isPremium=curUser&&(curUser.plan==='premium'||curUser.plan==='elite'||curUser.plan==='trial');
   const isElite=curUser&&curUser.plan==='elite';
   list.innerHTML=WDATA.map(w=>{
+    if(filterRole && w.role !== filterRole) return '';
     if(w.salaryTier==='elite'&&!isElite) return '';
     if(w.salaryTier==='premium'&&!isPremium) return '';
     const lvl=INFO_DATA[w.info]||INFO_DATA[1];
@@ -1583,13 +1589,84 @@ function wTab(btn){
 }
 
 // ═══════════════════════════════════════
+// SEARCH WORKERS
+// ═══════════════════════════════════════
+function searchWorkers(query){
+  const q = query.toLowerCase().trim();
+  // Reset role filter
+  document.querySelectorAll('.ca-f').forEach(b=>b.classList.remove('a'));
+  document.querySelector('.ca-f')?.classList.add('a');
+  if(!q){ buildWorkerList(); return; }
+  const list = document.getElementById('ca-list');
+  if(!list) return;
+  const isPremium = curUser&&(curUser.plan==='premium'||curUser.plan==='elite'||curUser.plan==='trial');
+  const isElite = curUser&&curUser.plan==='elite';
+  list.innerHTML = WDATA.filter(w=>{
+    if(w.salaryTier==='elite'&&!isElite) return false;
+    if(w.salaryTier==='premium'&&!isPremium) return false;
+    return w.nm.toLowerCase().includes(q) ||
+           w.role.toLowerCase().includes(q) ||
+           w.loc.toLowerCase().includes(q);
+  }).map(w=>{
+    const lvl=INFO_DATA[w.info]||INFO_DATA[1];
+    const sig=getSalarySignal(w.role,w.exp);
+    const tier=getScoreTier(w.stabScore);
+    const stars='★'.repeat(Math.floor(w.r))+'☆'.repeat(5-Math.floor(w.r));
+    return `<div class="ca-wc">
+      <div class="ca-wt">
+        <div class="ca-wav">${w.ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><div class="ca-wname">${w.nm}</div><div class="ca-wrole">${RICO[w.role]||''} ${w.role.toUpperCase()} · ${w.loc.toUpperCase()}</div></div>
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end">
+              <span class="pill" style="background:${lvl.color}22;color:${lvl.color};font-size:7px">${lvl.label}</span>
+              <span class="pill" style="background:${w.av?'rgba(13,196,158,.11)':'rgba(214,53,80,.11)'};color:${w.av?'#0DC49E':'#D63550'};font-size:7px">${w.av?'AVAILABLE':'BUSY'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--goldl);letter-spacing:2px;margin-bottom:7px">${stars} <span style="color:rgba(255,255,255,.22);font-size:9px">${w.r} (${w.rv}) · ${w.yrsExp} yrs exp</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+        <span class="pill" style="background:rgba(13,196,158,.09);color:#0DC49E;font-size:7px">✓ Aadhaar</span>
+        ${w.li?'<span class="pill" style="background:rgba(232,86,10,.09);color:var(--pl);font-size:7px">Live-in</span>':''}
+        ${w.role==='Cook'&&w.vegOnly?'<span class="pill" style="background:rgba(34,197,94,.12);color:#22C55E;border:1px solid rgba(34,197,94,.25);font-size:7px">🌿 VEG ONLY</span>':''}
+      </div>
+      <div class="ca-wsal">
+        <div><div class="ca-wsl">EXPECTED</div><div class="ca-wsv" style="color:var(--jadel)">₹${w.exp.toLocaleString()}/mo</div></div>
+        <div style="text-align:right">
+          <div class="ca-wsl">SALARY SIGNAL</div>
+          <div style="font-size:13px;font-weight:700;color:${sig.color}">${sig.icon} ${sig.label}</div>
+        </div>
+      </div>
+      ${isPremium?`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:8px 11px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span style="font-family:var(--ff-u);font-size:9px;color:rgba(255,255,255,.35)">WORKER SCORE</span><span style="font-family:var(--ff-d);font-size:13px;font-weight:700;color:${tier.color}">${w.stabScore}/100 · ${tier.label}</span></div>`:''}
+      <div class="ca-wbtns">
+        <button class="ca-bsv" onclick="toast('${w.nm} saved! ☆')">☆ Save</button>
+        <button class="ca-breq" ${!w.av?'disabled style="opacity:.4;cursor:not-allowed"':''} onclick="toast('Interview request sent to ${w.nm}! 📞')">${w.av?'Request Interview →':'Unavailable'}</button>
+      </div>
+    </div>`;
+  }).join('') || '<div style="text-align:center;padding:44px;color:rgba(255,255,255,.28);font-family:var(--ff-d);font-size:17px">No workers found for "'+q+'"</div>';
+}
+
+// ═══════════════════════════════════════
 // CUSTOMER APP FILTERS
 // ═══════════════════════════════════════
 document.querySelectorAll('.ca-f').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.ca-f').forEach(b=>b.classList.remove('a'));
     btn.classList.add('a');
-    toast('Filtering: '+btn.textContent.trim());
+    // Extract role from button text — remove emoji and trim
+    const raw = btn.textContent.trim();
+    const roleMap = {
+      'All': null,
+      '🏠 Maid': 'Maid',
+      '👨‍🍳 Cook': 'Cook',
+      '🚗 Driver': 'Driver',
+      '👶 Nanny': 'Nanny',
+      '❤️ Caregiver': 'Elderly Caregiver',
+      '📋 House Mgr': 'House Manager'
+    };
+    const filterRole = roleMap[raw] !== undefined ? roleMap[raw] : null;
+    buildWorkerList(filterRole);
   });
 });
 
