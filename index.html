@@ -1330,7 +1330,14 @@ async function subAuth(){
     try{
       if(authMode==='login'){
         const{data,error}=await sb.from('users').select('*').eq('phone',ph).eq('pin',pi).single();
-        if(data&&!error){enterApp(data.role_type||curRole,data);return;}
+        if(data&&!error){
+          enterApp(data.role_type||curRole,data);
+          return;
+        }
+        if(error&&error.code!=='PGRST116'){
+          // Real error (not "no rows found")
+          console.log('Login error:',error);
+        }
       }
     }catch(e){}
   }
@@ -1340,8 +1347,58 @@ async function subAuth(){
     if(u){enterApp(curRole,u);}
     else{const demo=pool[0];ee.textContent='Galat credentials. Demo: '+(demo?.phone||'')+' / PIN: '+(demo?.pin||'');ee.style.display='block';}
   } else {
+    // REGISTRATION — save to Supabase first
+    if(sb){
+      // Check if phone already exists in Supabase
+      try{
+        const{data:existing}=await sb.from('users').select('phone').eq('phone',ph).single();
+        if(existing){ee.textContent='Number already registered. Please login.';ee.style.display='block';return;}
+      }catch(e){} // not found = good, proceed
+      try{
+        // Save new user to Supabase
+        const{data:newUser,error:regError}=await sb.from('users').insert({
+          phone:ph,
+          name:nm||ph,
+          pin:pi,
+          role_type:curRole,
+          plan:'trial',
+          trial_started_at:new Date().toISOString(),
+          trial_ends_at:new Date(Date.now()+7*24*60*60*1000).toISOString()
+        }).select().single();
+        if(regError){
+          ee.textContent='Registration failed: '+regError.message;
+          ee.style.display='block';
+          return;
+        }
+        // If worker — also create worker record
+        if(curRole==='worker'){
+          await sb.from('workers').insert({
+            phone:ph,
+            name:nm||ph,
+            user_id:newUser.id,
+            info_level:0,
+            status:'active'
+          });
+        }
+        // If customer — also create household record
+        if(curRole==='customer'){
+          await sb.from('households').insert({
+            phone:ph,
+            name:nm||ph,
+            user_id:newUser.id,
+            plan:'trial'
+          });
+        }
+        enterApp(curRole,{...newUser,role_type:curRole});
+        return;
+      }catch(e){
+        console.log('Supabase registration error:',e);
+        // Fall through to demo mode
+      }
+    }
+    // Demo mode fallback (no Supabase)
     if(ALL_PH.includes(ph)){ee.textContent='Number already registered. Please login.';ee.style.display='block';return;}
-    enterApp(curRole,{phone:ph,name:nm||ph,pin:pi,role:null,info:0,plan:'trial'});
+    enterApp(curRole,{phone:ph,name:nm||ph,pin:pi,role_type:curRole,info:0,plan:'trial'});
   }
 }
 function demoLogin(){enterApp(curRole,(DB[curRole+'s']||DB.workers)[0]);}
